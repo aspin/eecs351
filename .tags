@@ -1,0 +1,14 @@
+VSHADER_SOURCE	/Users/aspin/eecs351/ch03/MultiPoint.js	/^var VSHADER_SOURCE =$/;"	variable	line:22
+FSHADER_SOURCE	/Users/aspin/eecs351/ch03/MultiPoint.js	/^var FSHADER_SOURCE =$/;"	variable	line:31
+n	/Users/aspin/eecs351/ch03/MultiPoint.js	/^var n = 12; \/\/ The number of vertices$/;"	variable	line:51
+gl	/Users/aspin/eecs351/ch03/MultiPoint.js	/^var gl;$/;"	variable	line:52
+main	/Users/aspin/eecs351/ch03/MultiPoint.js	/^function main() {$/;"	function	line:54
+main	/Users/aspin/eecs351/ch03/MultiPoint.js	/^function main() {$/;"	function	line:54
+i	/Users/aspin/eecs351/ch03/MultiPoint.js	/^var i;$/;"	variable	line:81
+keyPressed	/Users/aspin/eecs351/ch03/MultiPoint.js	/^function keyPressed(event) {$/;"	function	line:82
+switch	/Users/aspin/eecs351/ch03/MultiPoint.js	/^  switch (event.keyCode) {$/;"	function	line:83
+keyPressed	/Users/aspin/eecs351/ch03/MultiPoint.js	/^function keyPressed(event) {$/;"	function	line:82
+reDraw	/Users/aspin/eecs351/ch03/MultiPoint.js	/^function reDraw() {$/;"	function	line:119
+reDraw	/Users/aspin/eecs351/ch03/MultiPoint.js	/^function reDraw() {$/;"	function	line:119
+initVertexBuffers	/Users/aspin/eecs351/ch03/MultiPoint.js	/^function initVertexBuffers(gl) {$/;"	function	line:126
+initVertexBuffers	/Users/aspin/eecs351/ch03/MultiPoint.js	/^function initVertexBuffers(gl) {$/;"	function	line:126

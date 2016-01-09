@@ -33,75 +33,99 @@ var FSHADER_SOURCE =
   '  gl_FragColor = vec4(0.0, 1.0, 0.0, 1.0);\n' +
   '}\n';
 
-function main() {
-//==============================================================================
-  // Retrieve <canvas> element
-  var canvas = document.getElementById('webgl');
+var vertices = new Float32Array([
+   0.0,  0.5, 0.0, 1.0,	// CAREFUL! I made these into 4D points/ vertices: x,y,z,w.
+  -0.2,  0.2, 0.0, 1.0,
+  -0.5,  0.2, 0.0, 1.0,	// vertex
+  -0.3, -0.1, 0.0, 1.0,
+  -0.5, -0.5, 0.0, 1.0,
+  -0.2, -0.3, 0.0, 1.0,
+   0.0, -0.6, 0.0, 1.0, 	// new point!
+   0.2, -0.3, 0.0, 1.0,
+   0.5, -0.5, 0.0, 1.0,	//
+   0.3, -0.1, 0.0, 1.0,
+   0.5,  0.2, 0.0, 1.0, 	// last vertex
+   0.2,  0.2, 0.0, 1.0,
+]);
 
-  // Get the rendering context for WebGL
-  var gl = getWebGLContext(canvas);
+var n = 12; // The number of vertices
+var gl;
+
+function main() {
+  var canvas = document.getElementById('webgl');
+  window.addEventListener('keypress', keyPressed, false);
+
+  gl = getWebGLContext(canvas);
   if (!gl) {
     console.log('Failed to get the rendering context for WebGL');
     return;
   }
 
-  // Initialize shaders
   if (!initShaders(gl, VSHADER_SOURCE, FSHADER_SOURCE)) {
     console.log('Failed to intialize shaders.');
     return;
   }
 
-  // Write the positions of vertices to a vertex shader
   var n = initVertexBuffers(gl);
   if (n < 0) {
     console.log('Failed to set the positions of the vertices');
     return;
   }
 
-  // Specify the color for clearing <canvas>
   gl.clearColor(0, 0, 0, 1);
-
-  // Clear <canvas>
   gl.clear(gl.COLOR_BUFFER_BIT);
-
-  // Draw 6 points. see http://www.khronos.org/opengles/sdk/docs/man/xhtml/glDrawArrays.xml
-  gl.drawArrays(gl.LINE_LOOP, 0, n); // gl.drawArrays(mode, first, count)
-			//mode: sets drawing primitive to use. Other valid choices:
-				// gl.LINES, gl.LINE_STRIP, gl.LINE_LOOP,
-				// gl.TRIANGLES, gl.TRIANGLES_STRIP, gl.TRIANGLE_FAN
-			// first: index of 1st element of array.
-			// count; number of elements to read from the array.
-
-  // That went well. Let's draw them again!
-  //
-  gl.drawArrays(gl.POINTS, 0, n); // gl.drawArrays(mode, first, count)
-			//mode: sets drawing primitive to use. Other valid choices:
-				// gl.LINES, gl.LINE_STRIP, gl.LINE_LOOP,
-				// gl.TRIANGLES, gl.TRIANGLES_STRIP, gl.TRIANGLE_FAN
-			// first: index of 1st element of array.
-			// count; number of elements to read from the array.
+  gl.drawArrays(gl.LINE_LOOP, 0, n);
+  gl.drawArrays(gl.POINTS, 0, n);
 }
 
+var i;
+function keyPressed(event) {
+  switch (event.keyCode) {
+    case 119: // w, for up
+      for(i = 0; i < vertices.length; i++) {
+        if (i % 4 === 1) {
+          vertices[i] += 0.01;
+        }
+      }
+      reDraw();
+      break;
+    case 97: // a, for left
+      for(i = 0; i < vertices.length; i++) {
+        if (i % 4 === 0) {
+          vertices[i] -= 0.01;
+        }
+      }
+      reDraw();
+      break;
+    case 100: // d, for right
+      for(i = 0; i < vertices.length; i++) {
+        if (i % 4 === 0) {
+          vertices[i] += 0.01;
+        }
+      }
+      reDraw();
+      break;
+    case 115: // s, for down
+      for(i = 0; i < vertices.length; i++) {
+        if (i % 4 === 1) {
+          vertices[i] -= 0.01;
+        }
+      }
+      reDraw();
+      break;
+  }
+}
+
+function reDraw() {
+  gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
+  gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+  gl.drawArrays(gl.LINE_LOOP, 0, n);
+  gl.drawArrays(gl.POINTS, 0, n);
+}
 
 function initVertexBuffers(gl) {
 //==============================================================================
 // first, create an array with all our vertex attribute values:
-  var vertices = new Float32Array([
-     0.0,  0.5, 0.0, 1.0,	// CAREFUL! I made these into 4D points/ vertices: x,y,z,w.
-    -0.2,  0.2, 0.0, 1.0,
-    -0.5,  0.2, 0.0, 1.0,	// vertex
-    -0.3, -0.1, 0.0, 1.0,
-    -0.5, -0.5, 0.0, 1.0,
-    -0.2, -0.3, 0.0, 1.0,
-     0.0, -0.6, 0.0, 1.0, 	// new point!
-     0.2, -0.3, 0.0, 1.0,
-     0.5, -0.5, 0.0, 1.0,	//
-     0.3, -0.1, 0.0, 1.0,
-     0.5,  0.2, 0.0, 1.0, 	// last vertex
-     0.2,  0.2, 0.0, 1.0,
-
-  ]);
-  var n = 12; // The number of vertices
 
   // Then in the Graphics hardware, reate a vertex buffer object (VBO)
   var vertexBuffer = gl.createBuffer();	// get it's 'handle'
