@@ -1,0 +1,13 @@
+{
+  "name": "eecs351",
+  "version": "1.0.0",
+  "description": "collection of files for eecs351 at Northwestern",
+  "main": "gulpfile.js",
+  "scripts": {},
+  "author": "Kevin J. Chen <kevinchen2016@u.northwestern.edu> (http://kevinchen.ninja/)",
+  "license": "MIT",
+  "devDependencies": {
+    "browser-sync": "2.11.0",
+    "gulp": "3.9.0"
+  }
+}
