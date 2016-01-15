@@ -1,15 +1,24 @@
 var gulp = require('gulp'),
-    browserSync = require('browser-sync');
+  browserSync = require('browser-sync'),
+  argv = require('yargs').argv;
 
-gulp.task('browser-sync-book', function() {
-  browserSync.init(['book_code/**/*'], {
+gulp.task('browser-sync', function() {
+  var base, baseGlob;
+  if (argv.base) {
+    base = argv.base;
+  } else {
+    base = 'book_code';
+  }
+
+  baseGlob = base + '/**/*';
+  browserSync.init([baseGlob], {
     server: {
-      baseDir: 'book_code'
+      baseDir: base
     },
     port: 3000
   });
 
-  gulp.watch(['book_code/**/*']).on('change', browserSync.reload);
+  gulp.watch([baseGlob]).on('change', browserSync.reload);
 });
 
-gulp.task('up', ['browser-sync-book']);
+gulp.task('up', ['browser-sync']);
