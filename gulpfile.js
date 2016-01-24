@@ -13,7 +13,10 @@ gulp.task('browser-sync', function() {
   baseGlob = base + '/**/*';
   browserSync.init([baseGlob], {
     server: {
-      baseDir: base
+      baseDir: base,
+      routes: {
+        '/lib': 'lib/'
+      }
     },
     port: 3000
   });
