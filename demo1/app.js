@@ -8,10 +8,13 @@ function main() {
         vertices = getVertices(),
         count = vertices.length / 7,
         modelMatrix = new Matrix4(),
-        u_ModelMatrix = bindVariables(gl, vertices);
+        u_ModelMatrix = bindVariables(gl, vertices),
+        angles = { x: 0.0, y: 0.0 };
+
+    setupMouseHandlers(canvas, angles);
 
     var animate = function() {
-      updateMatrices(gl, modelMatrix, u_ModelMatrix);
+      updateMatrices(gl, modelMatrix, u_ModelMatrix, angles);
       draw(gl, count);
       requestAnimationFrame(animate, canvas);
     }
@@ -90,24 +93,50 @@ function bindVariables(gl, vertices) {
   return u_ModelMatrix;
 }
 
+function setupMouseHandlers(canvas, angles) {
+  var dragging = false;
+  var lastX = -1,
+      lastY = -1;
+
+  canvas.onmousedown = function(event) {
+    dragging = true;
+    lastX = event.clientX;
+    lastY = event.clientY;
+  }
+
+  canvas.onmouseup = function(event) {
+    dragging = false;
+  }
+
+  canvas.onmousemove = function(event) {
+    var dx, dy,
+        x = event.clientX,
+        y = event.clientY;
+    if (dragging) {
+      dx = x - lastX;
+      dy = y - lastY;
+      angles.x = dx;
+      angles.y = dy;
+    }
+  }
+}
+
 function draw(gl, count) {
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
   gl.drawArrays(gl.TRIANGLES, 0, count);
 }
 
-var angle = 0;
-function updateMatrices(gl, modelMatrix, u_ModelMatrix) {
-  angle = (angle + 0.5) % 360;
+function updateMatrices(gl, modelMatrix, u_ModelMatrix, angles) {
   modelMatrix.setTranslate(0.0, 0.0, 0.0);
   modelMatrix.scale(1, 1, -1);
   modelMatrix.scale(0.3, 0.3, 0.3);
-  modelMatrix.rotate(angle, 1, 1, 0);
+  modelMatrix.rotate(angles.x, 0, 1, 0);
+  modelMatrix.rotate(angles.y, 1, 0, 0);
   gl.uniformMatrix4fv(u_ModelMatrix, false, modelMatrix.elements);
 }
 
 function getVertices() {
   return new Float32Array([
-
     // x
      1.0, -1.0, -1.0, 1.0,    1.0, 0.0, 0.0,
      1.0,  1.0, -1.0, 1.0,    1.0, 0.0, 0.0,
