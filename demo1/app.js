@@ -1,6 +1,9 @@
 var VSHADER = 'vShared',
     FSHADER = 'fShared';
 
+var naturalSpin = 3;
+var dragging = false;
+
 function main() {
   loadShaders(function(sources) {
     var canvas = document.getElementById('webgl'),
@@ -94,14 +97,18 @@ function bindVariables(gl, vertices) {
 }
 
 function setupMouseHandlers(canvas, angles) {
-  var dragging = false;
   var lastX = -1,
       lastY = -1;
+
+  var baseX = angles.x,
+      baseY = angles.y
 
   canvas.onmousedown = function(event) {
     dragging = true;
     lastX = event.clientX;
     lastY = event.clientY;
+    baseX = angles.x;
+    baseY = angles.y;
   }
 
   canvas.onmouseup = function(event) {
@@ -115,8 +122,8 @@ function setupMouseHandlers(canvas, angles) {
     if (dragging) {
       dx = x - lastX;
       dy = y - lastY;
-      angles.x = dx;
-      angles.y = dy;
+      angles.x = baseX + dx;
+      angles.y = baseY + dy;
     }
   }
 }
@@ -130,6 +137,10 @@ function updateMatrices(gl, modelMatrix, u_ModelMatrix, angles) {
   modelMatrix.setTranslate(0.0, 0.0, 0.0);
   modelMatrix.scale(1, 1, -1);
   modelMatrix.scale(0.3, 0.3, 0.3);
+  if (!dragging) {
+    angles.x = angles.x + naturalSpin % 360;
+    angles.y = angles.y + naturalSpin % 360;
+  }
   modelMatrix.rotate(angles.x, 0, 1, 0);
   modelMatrix.rotate(angles.y, 1, 0, 0);
   gl.uniformMatrix4fv(u_ModelMatrix, false, modelMatrix.elements);
