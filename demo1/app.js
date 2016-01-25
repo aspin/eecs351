@@ -50,6 +50,30 @@ MorningStar.prototype.draw = function(gl, modelMatrix, u_ModelMatrix) {
       this.ball.rotation.xy, this.ball.rotation.xz, this.ball.rotation.yz));
 }
 
+function Joint(position, scale, rotation) {
+  this.out = new Rectangle(
+    position,
+    new Coordinate(scale, scale / 5, scale / 5),
+    new Rotation(rotation.x, rotation.y, rotation.z, rotation.xy, rotation.xz, rotation.yz));
+  this.bend = new Rectangle(
+    new Coordinate(position.x + scale, position.y + (scale / 1.25), position.z),
+    new Coordinate(scale / 5, scale, scale / 5),
+    new Rotation(rotation.x, rotation.y, rotation.z, rotation.xy, rotation.xz, rotation.yz));
+}
+
+Joint.prototype.draw = function(gl, modelMatrix, u_ModelMatrix) {
+  drawRectangle(gl, modelMatrix, u_ModelMatrix,
+    new Coordinate(this.bend.position.x, this.bend.position.y, this.bend.position.z),
+    new Coordinate(this.bend.scale.x, this.bend.scale.y, this.bend.scale.z),
+    new Rotation(this.bend.rotation.x, this.bend.rotation.y, this.bend.rotation.z,
+      this.bend.rotation.xy, this.bend.rotation.xz, this.bend.rotation.yz));
+  drawRectangle(gl, modelMatrix, u_ModelMatrix,
+    new Coordinate(this.out.position.x, this.out.position.y, this.out.position.z),
+    new Coordinate(this.out.scale.x, this.out.scale.y, this.out.scale.z),
+    new Rotation(this.out.rotation.x, this.out.rotation.y, this.out.rotation.z,
+      this.out.rotation.xy, this.out.rotation.xz, this.out.rotation.yz));
+}
+
 function Rectangle(position, scale, rotation) {
   this.position = position;
   this.scale = scale;
@@ -79,7 +103,14 @@ function main() {
       new Rotation(-0.3, -0.3, -0.3, 0, 0, 0)
     ));
 
-    // setupMouseHandlers(canvas, shapes);
+    shapes.push(new Joint(
+      new Coordinate(-0.5, -0.5, 0.0),
+      0.3,
+      new Rotation(0, 0, 0, 0, 0, 0)
+    ));
+
+    setupMouseHandlers(canvas, shapes);
+    // setupKeyboardHandles(canvas, shapes);
 
     var animate = function() {
       updateShapes(shapes);
@@ -165,15 +196,15 @@ function setupMouseHandlers(canvas, shapes) {
   var lastX = -1,
       lastY = -1;
 
-  var baseX = angles.x,
-      baseY = angles.y
+  // var baseX = angles.x,
+  //     baseY = angles.y
 
   canvas.onmousedown = function(event) {
     dragging = true;
-    lastX = event.clientX;
-    lastY = event.clientY;
-    baseX = angles.x;
-    baseY = angles.y;
+    // lastX = event.clientX;
+    // lastY = event.clientY;
+    // baseX = angles.x;
+    // baseY = angles.y;
   }
 
   canvas.onmouseup = function(event) {
@@ -181,15 +212,15 @@ function setupMouseHandlers(canvas, shapes) {
   }
 
   canvas.onmousemove = function(event) {
-    var dx, dy,
-        x = event.clientX,
-        y = event.clientY;
-    if (dragging) {
-      dx = x - lastX;
-      dy = y - lastY;
-      angles.x = baseX + dx;
-      angles.y = baseY + dy;
-    }
+    // var dx, dy,
+    //     x = event.clientX,
+    //     y = event.clientY;
+    // if (dragging) {
+    //   dx = x - lastX;
+    //   dy = y - lastY;
+    //   angles.x = baseX + dx;
+    //   angles.y = baseY + dy;
+    // }
   }
 }
 
@@ -226,6 +257,7 @@ var extend = true;
 function updateShapes(shapes) {
   if (!dragging) {
     var morningStar = shapes[0];
+    var joint = shapes[1];
     morningStar.ball.rotation.x += 1;
     morningStar.chain.rotation.x -= 1;
     morningStar.handle.rotation.x += 0.5;
@@ -238,6 +270,8 @@ function updateShapes(shapes) {
       morningStar.ball.position.y += 0.01;
       extend = morningStar.chain.scale.y < 0.1
     }
+
+    joint.out.rotation.z -= 1;
   }
 }
 
