@@ -79,6 +79,16 @@ function Joint(position, scale, rotation) {
     new Coordinate(scale / 5, scale, scale / 5),
     new Rotation(rotation.x, rotation.y, rotation.z, rotation.xy, rotation.xz, rotation.yz),
     new Coordinate(0, scale / 1.25, 0));
+  this.join2 = new Rectangle(
+    new Coordinate(0, scale * 1.5, 0),
+    new Coordinate(scale / 2, scale / 2, scale / 2),
+    new Rotation(rotation.x, rotation.y, rotation.z, rotation.xy, rotation.xz, rotation.yz),
+    new Coordinate(0, 0, 0));
+  this.bend2 = new Rectangle(
+    new Coordinate(0, scale / 1.25, 0),
+    new Coordinate(scale / 5, scale, scale / 5),
+    new Rotation(rotation.x, rotation.y, rotation.z + 270, rotation.xy, rotation.xz, rotation.yz),
+    new Coordinate(0, scale / 1.25, 0));
   this.end = new MultiPyramid(
     new Coordinate(0, scale * 1.5, 0),
     new Coordinate(scale, scale, scale),
@@ -112,6 +122,22 @@ Joint.prototype.draw = function(gl, modelMatrix, u_ModelMatrix) {
     new Coordinate(this.bend.origin.x, this.bend.origin.y, this.bend.origin.z));
 
   undoScale(this.bend, modelMatrix);
+  drawRectangle(gl, modelMatrix, u_ModelMatrix,
+    new Coordinate(this.join2.position.x, this.join2.position.y, this.join2.position.z),
+    new Coordinate(this.join2.scale.x, this.join2.scale.y, this.join2.scale.z),
+    new Rotation(this.join2.rotation.x, this.join2.rotation.y, this.join2.rotation.z,
+      this.join2.rotation.xy, this.join2.rotation.xz, this.join2.rotation.yz),
+    new Coordinate(this.join2.origin.x, this.join2.origin.y, this.join2.origin.z));
+
+  undoScale(this.join2, modelMatrix);
+  drawRectangle(gl, modelMatrix, u_ModelMatrix,
+    new Coordinate(this.bend2.position.x, this.bend2.position.y, this.bend2.position.z),
+    new Coordinate(this.bend2.scale.x, this.bend2.scale.y, this.bend2.scale.z),
+    new Rotation(this.bend2.rotation.x, this.bend2.rotation.y, this.bend2.rotation.z,
+      this.bend2.rotation.xy, this.bend2.rotation.xz, this.bend2.rotation.yz),
+    new Coordinate(this.bend2.origin.x, this.bend2.origin.y, this.bend2.origin.z));
+
+  undoScale(this.bend2, modelMatrix);
   drawMultiPyramid(gl, modelMatrix, u_ModelMatrix,
     new Coordinate(this.end.position.x, this.end.position.y, this.end.position.z),
     new Coordinate(this.end.scale.x, this.end.scale.y, this.end.scale.z),
@@ -168,6 +194,9 @@ function main() {
 
     setupMouseHandlers(canvas, shapes);
     setupKeyboardHandlers(canvas, shapes);
+    document.getElementById('reset').onclick = function() {
+      spinConstant = 0.5;
+    }
 
     var animate = function() {
       updateShapes(shapes);
@@ -218,6 +247,7 @@ function initWebGL(canvas, sources) {
     throw 'Failed to initialize shaders';
   }
   gl.clearColor(0, 0, 0, 1);
+	gl.depthFunc(gl.LESS);
   gl.enable(gl.DEPTH_TEST);
   return gl;
 }
@@ -279,10 +309,6 @@ function setupMouseHandlers(canvas, shapes) {
       dy = y - lastY;
       joint.out.rotation.x = baseX + dx;
       joint.out.rotation.y = baseY + dy;
-      joint.bend.rotation.x = baseX + dx;
-      joint.bend.rotation.y = baseY + dy;
-      joint.end.rotation.x = baseX + dx;
-      joint.end.rotation.y = baseY + dy;
     }
   }
 }
@@ -296,23 +322,15 @@ function setupKeyboardHandlers(canvas, shapes) {
     switch (event.keyCode) {
       case 119: // w, for up
         joint.out.position.y += 0.01;
-        joint.bend.position.y += 0.01;
-        joint.end.position.y += 0.01;
         break;
       case 97: // a, for left
         joint.out.position.x -= 0.01;
-        joint.bend.position.x -= 0.01;
-        joint.end.position.x -= 0.01;
         break;
       case 100: // d, for right
         joint.out.position.x += 0.01;
-        joint.bend.position.x += 0.01;
-        joint.end.position.x += 0.01;
         break;
       case 115: // s, for down
         joint.out.position.y -= 0.01;
-        joint.bend.position.y -= 0.01;
-        joint.end.position.y -= 0.01;
         break;
     }
   }
@@ -387,65 +405,9 @@ function updateShapes(shapes) {
     joint.out.rotation.z -= 1;
     joint.out.rotation.y -= 1;
     joint.bend.rotation.y -= 1;
+    joint.bend2.rotation.x -= 1;
     joint.end.rotation.x -= 3;
   }
-}
-
-function Drawer() {
-  this.vertices = {};
-  this.triangles = {};
-  this.colors = {};
-}
-
-Drawer.prototype.addVertex = function(id, x, y, z) {
-  this.vertices[id] = [x, y, z, 1.0];
-};
-
-Drawer.prototype.addTriangle = function(id, p1, p2, p3) {
-  this.triangles[id] = [this.vertices[p1], this.vertices[p2], this.vertices[p3]];
-}
-
-Drawer.prototype.addColor = function(id, r, g, b) {
-  this.colors[id] = [r, g, b];
-}
-
-Drawer.prototype.getRandomColors = function(count) {
-  var colors = [];
-  for(var i = 0; i < count; i++) {
-    colors.push(this.getRandomColor());
-  }
-  return colors;
-}
-
-// decaying probability getter
-Drawer.prototype.getRandomColor = function() {
-  // var result;
-  // var count = 1.0;
-  // for (var key in this.colors) {
-  //   if (Math.random() < 1.0 / count) {
-  //     result = key;
-  //   }
-  //   count++;
-  // }
-  // return result;
-  return [Math.random(), Math.random(), Math.random()];
-}
-
-// triangleOrder = [1, 2, 0, 3, 4, ...]
-Drawer.prototype.exportTriangles = function(triangleSet, colorSet) {
-  var self = this,
-      output = [];
-  if (triangleSet.length !== colorSet.length) {
-    throw 'Arrays must be of equal length';
-  }
-  for(var i in triangleSet) {
-    self.triangles[triangleSet[i]].forEach(function(point) {
-      // var concater = point.concat(self.colors[colorSet[i]]);
-      var concater = point.concat(colorSet[i]);
-      output = output.concat(concater);
-    });
-  }
-  return new Float32Array(output);
 }
 
 function getVertices() {
@@ -472,23 +434,9 @@ function getVertices() {
   drawUtil.addTriangle('-z1', 'btl', 'btr', 'bbr');
   drawUtil.addTriangle('-z2', 'btl', 'bbl', 'bbr');
 
-  drawUtil.addColor('red', 1.0, 0.0, 0.0);
-  drawUtil.addColor('green', 0.0, 1.0, 0.0);
-  drawUtil.addColor('blue', 0.0, 0.0, 1.0);
-  drawUtil.addColor('yellow', 1.0, 1.0, 0.0);
-  drawUtil.addColor('cyan', 0.0, 1.0, 1.0);
-  drawUtil.addColor('magenta', 1.0, 0.0, 1.0);
-
   var rectangleTris = ['+x1', '+x2', '+y1', '+y2', '+z1', '+z2',
                        '-x1', '-x2', '-y1', '-y2', '-z1', '-z2'];
-  var rColors = drawUtil.getRandomColors(rectangleTris.length / 2),
-      rectangleColors = [];
-  rColors.forEach(function(color) {
-    rectangleColors.push(color);
-    rectangleColors.push(color);
-  });
-
-  // Creating an icosahedron
+  // Creating an icosahedron + 1 vertex
   var r52 = (1.0 + Math.sqrt(5.0)) / 2.0;
   drawUtil.addVertex('i0', -1.0, r52, 0);
   drawUtil.addVertex('i1', 1.0, r52, 0);
@@ -528,7 +476,6 @@ function getVertices() {
   for(var i = 0; i < 20; i++) {
     icosaTriangles.push('if' + i);
   }
-  var icosaColors = drawUtil.getRandomColors(icosaTriangles.length);
 
   // star
   var r32 = Math.sqrt(3.0) / 2;
@@ -618,9 +565,7 @@ function getVertices() {
       doublePTriangles.push('dpz' + i);
     }
   }
-  var doublePColors = drawUtil.getRandomColors(doublePTriangles.length);
 
   var triangles = rectangleTris.concat(icosaTriangles).concat(doublePTriangles);
-  var colors = rectangleColors.concat(icosaColors).concat(doublePColors);
-  return drawUtil.exportTriangles(triangles, colors);
+  return drawUtil.exportTriangles(triangles);
 }
