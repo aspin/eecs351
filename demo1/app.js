@@ -403,20 +403,20 @@ function updateShapes(shapes) {
     var morningStar = shapes[0];
     var joint = shapes[1];
 
-    morningStar.slider.rotation.x += 5;
+    morningStar.slider.rotation.x += 4;
     morningStar.slider.rotation.y += 0.1;
     morningStar.handle.rotation.x -= spinConstant;
     morningStar.ball.rotation.x -= 2;
 
     if (swingLeft) {
       morningStar.handle.rotation.z -= spinConstant;
-      morningStar.chain.rotation.z -= spinConstant + 0.1;
-      morningStar.ball.rotation.z -= spinConstant + 0.1;
+      morningStar.slider.scale.x += 0.008;
+      morningStar.chain.rotation.z -= spinConstant + 0.3;
       swingLeft = morningStar.handle.rotation.z > -40;
     } else {
+      morningStar.slider.scale.x -= 0.008;
       morningStar.handle.rotation.z += spinConstant;
-      morningStar.chain.rotation.z += spinConstant + 0.1;
-      morningStar.ball.rotation.z += spinConstant + 0.1;
+      morningStar.chain.rotation.z += spinConstant + 0.3;
       swingLeft = morningStar.handle.rotation.z > 40;
     }
 
