@@ -24,17 +24,7 @@ Drawer.prototype.getRandomColors = function(count) {
   return colors;
 }
 
-// decaying probability getter
 Drawer.prototype.getRandomColor = function() {
-  // var result;
-  // var count = 1.0;
-  // for (var key in this.colors) {
-  //   if (Math.random() < 1.0 / count) {
-  //     result = key;
-  //   }
-  //   count++;
-  // }
-  // return result;
   return [Math.random(), Math.random(), Math.random()];
 }
 

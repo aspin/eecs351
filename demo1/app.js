@@ -208,7 +208,7 @@ function main() {
       new Rotation(0, 0, 0, 0, 0, 0)
     ));
 
-    setupMouseHandlers(canvas, shapes);
+    setupMouseHandlers(gl, canvas, shapes);
     setupKeyboardHandlers(canvas, shapes);
     document.getElementById('reset').onclick = function() {
       spinConstant = 0.5;
@@ -296,7 +296,7 @@ function bindVariables(gl, vertices) {
 }
 
 var spinConstant = 0.5
-function setupMouseHandlers(canvas, shapes) {
+function setupMouseHandlers(gl, canvas, shapes) {
   var lastX = -1,
       lastY = -1;
   var joint = shapes[1];
@@ -313,7 +313,9 @@ function setupMouseHandlers(canvas, shapes) {
 
   canvas.onmouseup = function(event) {
     dragging = false;
-    spinConstant += 0.1;
+    vertices = getVertices();
+    gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
+    gl.vertexAttribPointer(a_Color, 3, gl.FLOAT, false, size * 7, size * 4);
   }
 
   canvas.onmousemove = function(event) {
