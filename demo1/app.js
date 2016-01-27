@@ -18,11 +18,16 @@ function Rotation(x, y, z, xy, xz, yz) {
 
 // @params Cordinate, Scalar, Coordinate
 function MorningStar(position, scale, rotation) {
-  this.handle = new Rectangle(
+  this.slider = new Rectangle(
     position,
-    new Coordinate(scale / 5, scale, scale / 5),
+    new Coordinate(scale, scale / 5, scale / 3),
     new Rotation(rotation.x, rotation.y, rotation.z, rotation.xy, rotation.xz, rotation.yz),
     new Coordinate(0, 0, 0));
+  this.handle = new Rectangle(
+    new Coordinate(0, -scale, 0),
+    new Coordinate(scale / 5, scale, scale / 5),
+    new Rotation(rotation.x, rotation.y, rotation.z, rotation.xy, rotation.xz, rotation.yz),
+    new Coordinate(0, -scale, 0));
   this.chain = new Rectangle(
     new Coordinate(0, -scale, 0),
     new Coordinate(scale / 10, scale / 2.5, scale / 10),
@@ -37,6 +42,17 @@ function MorningStar(position, scale, rotation) {
 
 MorningStar.prototype.draw = function(gl, modelMatrix, u_ModelMatrix) {
   modelMatrix.setTranslate(0, 0, 0);
+
+  drawRectangle(gl, modelMatrix, u_ModelMatrix,
+    new Coordinate(this.slider.position.x, this.slider.position.y, this.slider.position.z),
+    new Coordinate(this.slider.scale.x, this.slider.scale.y, this.slider.scale.z),
+    new Rotation(this.slider.rotation.x, this.slider.rotation.y, this.slider.rotation.z,
+      this.slider.rotation.xy, this.slider.rotation.xz, this.slider.rotation.yz),
+    new Coordinate(this.slider.origin.x, this.slider.origin.y, this.slider.origin.z));
+
+  undoScale(this.slider, modelMatrix);
+
+
   drawRectangle(gl, modelMatrix, u_ModelMatrix,
     new Coordinate(this.handle.position.x, this.handle.position.y, this.handle.position.z),
     new Coordinate(this.handle.scale.x, this.handle.scale.y, this.handle.scale.z),
@@ -183,12 +199,12 @@ function main() {
     var shapes = [];
     shapes.push(new MorningStar(
       new Coordinate(0.4, 0.4, 0.0),
-      0.5,
+      0.3,
       new Rotation(-0.3, -0.3, -0.3, 0, 0, 0)
     ));
     shapes.push(new Joint(
       new Coordinate(-0.5, -0.5, 0.0),
-      0.3,
+      0.2,
       new Rotation(0, 0, 0, 0, 0, 0)
     ));
 
@@ -385,10 +401,10 @@ function updateShapes(shapes) {
     var morningStar = shapes[0];
     var joint = shapes[1];
 
+    morningStar.slider.rotation.x += 5;
+    morningStar.slider.rotation.y += 0.1;
     morningStar.handle.rotation.x -= spinConstant;
     morningStar.ball.rotation.x -= 2;
-    // morningStar.chain.rotation.x -= spinConstant;
-    // morningStar.ball.rotation.x -= spinConstant;
 
     if (swingLeft) {
       morningStar.handle.rotation.z -= spinConstant;
