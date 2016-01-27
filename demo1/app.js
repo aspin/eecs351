@@ -375,7 +375,7 @@ function drawSpike(gl, modelMatrix, u_ModelMatrix, location, scale, rotation, or
 
 function drawMultiPyramid(gl, modelMatrix, u_ModelMatrix, location, scale, rotation, origin) {
   updateMatrices(modelMatrix, location, scale, rotation, origin);
-  drawThing(gl, modelMatrix, u_ModelMatrix, 96, 72);
+  drawThing(gl, modelMatrix, u_ModelMatrix, 96, 96);
 }
 
 var extend = true;
@@ -478,94 +478,70 @@ function getVertices() {
   }
 
   // star
-  var r32 = Math.sqrt(3.0) / 2;
-  var r36 = r32 / 3;
-  drawUtil.addVertex('dp0', 2 * r36, 0, 0);
-  drawUtil.addVertex('dp1', -r36, -0.5, -0.5);
-  drawUtil.addVertex('dp2', -r36, 0.5, -0.5);
-  drawUtil.addVertex('dp3', -r36, -0.5, 0.5);
-  drawUtil.addVertex('dp4', -r36, 0.5, 0.5);
-  drawUtil.addVertex('dp5', -2 * r36, 0, 0);
-  drawUtil.addVertex('dp6', r36, -0.5, -0.5);
-  drawUtil.addVertex('dp7', r36, 0.5, -0.5);
-  drawUtil.addVertex('dp8', r36, -0.5, 0.5);
-  drawUtil.addVertex('dp9', r36, 0.5, 0.5);
-  drawUtil.addVertex('dpy0', 0, 2 * r36, 0);
-  drawUtil.addVertex('dpy1', -0.5, -r36, -0.5);
-  drawUtil.addVertex('dpy2', 0.5, -r36, -0.5);
-  drawUtil.addVertex('dpy3', -0.5, -r36, 0.5);
-  drawUtil.addVertex('dpy4', 0.5, -r36, 0.5);
-  drawUtil.addVertex('dpy5', 0, -2 * r36, 0);
-  drawUtil.addVertex('dpy6', -0.5, r36, -0.5);
-  drawUtil.addVertex('dpy7', 0.5, -r36, 0.5);
-  drawUtil.addVertex('dpy8', -0.5, r36, 0.5);
-  drawUtil.addVertex('dpy9', 0.5, r36, 0.5);
-  drawUtil.addVertex('dpz0', 0, 0, 2 * r36);
-  drawUtil.addVertex('dpz1', -0.5, -0.5, -r36);
-  drawUtil.addVertex('dpz2', 0.5, -0.5, -r36);
-  drawUtil.addVertex('dpz3', -0.5, 0.5, -r36);
-  drawUtil.addVertex('dpz4', 0.5, 0.5, -r36);
-  drawUtil.addVertex('dpz5', 0, 0, -2 * r36);
-  drawUtil.addVertex('dpz6', -0.5, -0.5, r36);
-  drawUtil.addVertex('dpz7', 0.5, 0.5, -r36);
-  drawUtil.addVertex('dpz8', -0.5, 0.5, r36);
-  drawUtil.addVertex('dpz9', 0.5, 0.5, r36);
 
-  // TODO: tetrahedron, not pyramid
-  drawUtil.addTriangle('dpx0', 'dp0', 'dp1', 'dp2');
-  drawUtil.addTriangle('dpx1', 'dp0', 'dp2', 'dp3');
-  drawUtil.addTriangle('dpx2', 'dp0', 'dp3', 'dp4');
-  drawUtil.addTriangle('dpx3', 'dp0', 'dp4', 'dp1');
-  // drawUtil.addTriangle('dpx4', 'dp1', 'dp2', 'dp3');
-  // drawUtil.addTriangle('dpx5', 'dp3', 'dp4', 'dp1');
-  drawUtil.addTriangle('dpx6', 'dp5', 'dp6', 'dp7');
-  drawUtil.addTriangle('dpx7', 'dp5', 'dp7', 'dp8');
-  drawUtil.addTriangle('dpx8', 'dp5', 'dp8', 'dp9');
-  drawUtil.addTriangle('dpx9', 'dp5', 'dp9', 'dp5');
-  // drawUtil.addTriangle('dpx10', 'dp6', 'dp7', 'dp8');
-  // drawUtil.addTriangle('dpx11', 'dp8', 'dp9', 'dp6');
-  drawUtil.addTriangle('dpy0', 'dpy0', 'dpy1', 'dpy2');
-  drawUtil.addTriangle('dpy1', 'dpy0', 'dpy2', 'dpy3');
-  drawUtil.addTriangle('dpy2', 'dpy0', 'dpy3', 'dpy4');
-  drawUtil.addTriangle('dpy3', 'dpy0', 'dpy4', 'dpy1');
-  // drawUtil.addTriangle('dpy4', 'dpy1', 'dpy2', 'dpy3');
-  // drawUtil.addTriangle('dpy5', 'dpy3', 'dpy4', 'dpy1');
-  drawUtil.addTriangle('dpy6', 'dpy5', 'dpy6', 'dpy7');
-  drawUtil.addTriangle('dpy7', 'dpy5', 'dpy7', 'dpy8');
-  drawUtil.addTriangle('dpy8', 'dpy5', 'dpy8', 'dpy9');
-  drawUtil.addTriangle('dpy9', 'dpy5', 'dpy9', 'dpy5');
-  // drawUtil.addTriangle('dpy10', 'dpy6', 'dpy7', 'dpy8');
-  // drawUtil.addTriangle('dpy11', 'dpy8', 'dpy9', 'dpy6');
-  drawUtil.addTriangle('dpz0', 'dpz0', 'dpz1', 'dpz2');
-  drawUtil.addTriangle('dpz1', 'dpz0', 'dpz2', 'dpz3');
-  drawUtil.addTriangle('dpz2', 'dpz0', 'dpz3', 'dpz4');
-  drawUtil.addTriangle('dpz3', 'dpz0', 'dpz4', 'dpz1');
-  // drawUtil.addTriangle('dpz4', 'dpz1', 'dpz2', 'dpz3');
-  // drawUtil.addTriangle('dpz5', 'dpz3', 'dpz4', 'dpz1');
-  drawUtil.addTriangle('dpz6', 'dpz5', 'dpz6', 'dpz7');
-  drawUtil.addTriangle('dpz7', 'dpz5', 'dpz7', 'dpz8');
-  drawUtil.addTriangle('dpz8', 'dpz5', 'dpz8', 'dpz9');
-  drawUtil.addTriangle('dpz9', 'dpz5', 'dpz9', 'dpz5');
-  // drawUtil.addTriangle('dpz10', 'dpz6', 'dpz7', 'dpz8');
-  // drawUtil.addTriangle('dpz11', 'dpz8', 'dpz9', 'dpz6');
+  drawUtil.addVertex('o', 0, 0, 0.3);
+  drawUtil.addVertex('+sx', 1, 0, 0.3);
+  drawUtil.addVertex('-sx', -1, 0, 0.3);
+  drawUtil.addVertex('+sy', 0, 1, 0.3);
+  drawUtil.addVertex('-sy', 0, -1, 0.3);
+  drawUtil.addVertex('s+x+y', 0.3, 0.3, 0.3);
+  drawUtil.addVertex('s+x-y', 0.3, -0.3, 0.3);
+  drawUtil.addVertex('s-x+y', -0.3, 0.3, 0.3);
+  drawUtil.addVertex('s-x-y', -0.3, -0.3, 0.3);
+  drawUtil.addVertex('ob', 0, 0, -0.3);
+  drawUtil.addVertex('+sbx', 1, 0, -0.3);
+  drawUtil.addVertex('-sbx', -1, 0, -0.3);
+  drawUtil.addVertex('+sby', 0, 1, -0.3);
+  drawUtil.addVertex('-sby', 0, -1, -0.3);
+  drawUtil.addVertex('sb+x+y', 0.3, 0.3, -0.3);
+  drawUtil.addVertex('sb+x-y', 0.3, -0.3, -0.3);
+  drawUtil.addVertex('sb-x+y', -0.3, 0.3, -0.3);
+  drawUtil.addVertex('sb-x-y', -0.3, -0.3, -0.3);
 
-  var doublePTriangles = [];
-  for(i = 0; i < 12; i++) {
-    if ([4, 5, 10, 11].indexOf(i) === -1) {
-      doublePTriangles.push('dpx' + i);
-    }
+  drawUtil.addTriangle('sf0', 'o', '+sx', 's+x+y');
+  drawUtil.addTriangle('sf1', 'o', '+sx', 's+x-y');
+  drawUtil.addTriangle('sf2', 'o', '-sx', 's-x+y');
+  drawUtil.addTriangle('sf3', 'o', '-sx', 's-x-y');
+  drawUtil.addTriangle('sf4', 'o', '+sy', 's+x+y');
+  drawUtil.addTriangle('sf5', 'o', '+sy', 's-x+y');
+  drawUtil.addTriangle('sf6', 'o', '-sy', 's+x-y');
+  drawUtil.addTriangle('sf7', 'o', '-sy', 's-x-y');
+  drawUtil.addTriangle('sb0', 'ob', '+sbx', 'sb+x+y');
+  drawUtil.addTriangle('sb1', 'ob', '+sbx', 'sb+x-y');
+  drawUtil.addTriangle('sb2', 'ob', '-sbx', 'sb-x+y');
+  drawUtil.addTriangle('sb3', 'ob', '-sbx', 'sb-x-y');
+  drawUtil.addTriangle('sb4', 'ob', '+sby', 'sb+x+y');
+  drawUtil.addTriangle('sb5', 'ob', '+sby', 'sb-x+y');
+  drawUtil.addTriangle('sb6', 'ob', '-sby', 'sb+x-y');
+  drawUtil.addTriangle('sb7', 'ob', '-sby', 'sb-x-y');
+  drawUtil.addTriangle('se0', '+sx', 's+x+y', 'sb+x+y');
+  drawUtil.addTriangle('se1', '+sx', '+sbx', 'sb+x+y');
+  drawUtil.addTriangle('se2', '+sy', 's+x+y', 'sb+x+y');
+  drawUtil.addTriangle('se3', '+sy', '+sby', 'sb+x+y');
+  drawUtil.addTriangle('se4', '+sy', 's-x+y', 'sb-x+y');
+  drawUtil.addTriangle('se5', '+sy', '+sby', 'sb-x+y');
+  drawUtil.addTriangle('se6', '-sx', 's-x+y', 'sb-x+y');
+  drawUtil.addTriangle('se7', '-sx', '-sbx', 'sb-x+y');
+  drawUtil.addTriangle('se8', '-sx', 's-x-y', 'sb-x-y');
+  drawUtil.addTriangle('se9', '-sx', '-sbx', 'sb-x-y');
+  drawUtil.addTriangle('se10', '-sy', 's-x-y', 'sb-x-y');
+  drawUtil.addTriangle('se11', '-sy', '-sby', 'sb-x-y');
+  drawUtil.addTriangle('se12', '-sy', 's+x-y', 'sb+x-y');
+  drawUtil.addTriangle('se13', '-sy', '-sby', 'sb+x-y');
+  drawUtil.addTriangle('se14', '+sx', 's+x-y', 'sb+x-y');
+  drawUtil.addTriangle('se15', '+sx', '+sbx', 'sb+x-y');
+
+  var starTriangles = [];
+  for(i = 0; i < 8; i++) {
+    starTriangles.push('sf' + i);
   }
-  for(i = 0; i < 12; i++) {
-    if ([4, 5, 10, 11].indexOf(i) === -1) {
-      doublePTriangles.push('dpy' + i);
-    }
+  for(i = 0; i < 8; i++) {
+    starTriangles.push('sb' + i);
   }
-  for(i = 0; i < 12; i++) {
-    if ([4, 5, 10, 11].indexOf(i) === -1) {
-      doublePTriangles.push('dpz' + i);
-    }
+  for(i = 0; i < 16; i++) {
+    starTriangles.push('se' + i);
   }
 
-  var triangles = rectangleTris.concat(icosaTriangles).concat(doublePTriangles);
+  var triangles = rectangleTris.concat(icosaTriangles).concat(starTriangles);
   return drawUtil.exportTriangles(triangles);
 }
