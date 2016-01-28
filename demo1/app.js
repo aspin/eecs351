@@ -209,9 +209,10 @@ function main() {
     ));
 
     setupMouseHandlers(gl, canvas, shapes);
-    setupKeyboardHandlers(canvas, shapes);
+    setupKeyboardHandlers(gl, canvas, shapes);
     document.getElementById('reset').onclick = function() {
-      spinConstant = 0.5;
+      var randomColor = new Drawer().getRandomColor();
+      gl.clearColor(randomColor[0], randomColor[1], randomColor[2], 1);
     }
 
     var animate = function() {
@@ -337,7 +338,7 @@ function setupMouseHandlers(gl, canvas, shapes) {
   }
 }
 
-function setupKeyboardHandlers(canvas, shapes) {
+function setupKeyboardHandlers(gl, canvas, shapes) {
   var morningStar = shapes[0],
       joint = shapes[1];
 
