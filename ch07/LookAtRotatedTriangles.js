@@ -51,7 +51,7 @@ function main() {
   // Get the storage location of u_ViewMatrix and u_ModelMatrix
   var u_ViewMatrix = gl.getUniformLocation(gl.program, 'u_ViewMatrix');
   var u_ModelMatrix = gl.getUniformLocation(gl.program, 'u_ModelMatrix');
-  if(!u_ViewMatrix || !u_ModelMatrix) { 
+  if(!u_ViewMatrix || !u_ModelMatrix) {
     console.log('Failed to get the storage location of u_viewMatrix or u_ModelMatrix');
     return;
   }
@@ -62,7 +62,7 @@ function main() {
 
   // Calculate matrix for rotate
   var modelMatrix = new Matrix4();
-  modelMatrix.setRotate(-10, 0, 0, 1); // Rotate around z-axis
+  modelMatrix.setRotate(100, 0, 0, 1); // Rotate around z-axis
 
   // Pass the view projection matrix and model matrix
   gl.uniformMatrix4fv(u_ViewMatrix, false, viewMatrix.elements);
@@ -80,20 +80,20 @@ function initVertexBuffers(gl) {
     // Vertex coordinates and color
      0.0,  0.5,  -0.4,  0.4,  1.0,  0.4, // The back green one
     -0.5, -0.5,  -0.4,  0.4,  1.0,  0.4,
-     0.5, -0.5,  -0.4,  1.0,  0.4,  0.4, 
-   
+     0.5, -0.5,  -0.4,  1.0,  0.4,  0.4,
+
      0.5,  0.4,  -0.2,  1.0,  0.4,  0.4, // The middle yellow one
     -0.5,  0.4,  -0.2,  1.0,  1.0,  0.4,
-     0.0, -0.6,  -0.2,  1.0,  1.0,  0.4, 
+     0.0, -0.6,  -0.2,  1.0,  1.0,  0.4,
 
-     0.0,  0.5,   0.0,  0.4,  0.4,  1.0,  // The front blue one 
+     0.0,  0.5,   0.0,  0.4,  0.4,  1.0,  // The front blue one
     -0.5, -0.5,   0.0,  0.4,  0.4,  1.0,
-     0.5, -0.5,   0.0,  1.0,  0.4,  0.4, 
+     0.5, -0.5,   0.0,  1.0,  0.4,  0.4,
   ]);
   var n = 9;
 
   // Create a buffer object
-  var vertexColorBuffer = gl.createBuffer();  
+  var vertexColorBuffer = gl.createBuffer();
   if (!vertexColorBuffer) {
     console.log('Failed to create the buffer object');
     return -1;

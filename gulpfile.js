@@ -3,11 +3,17 @@ var gulp = require('gulp'),
   argv = require('yargs').argv;
 
 gulp.task('browser-sync', function() {
-  var base, baseGlob;
+  var base, baseGlob, port;
   if (argv.base) {
     base = argv.base;
   } else {
     base = 'book_code';
+  }
+
+  if (argv.port) {
+    port = Number(argv.port);
+  } else {
+    port = 3000;
   }
 
   baseGlob = base + '/**/*';
@@ -18,7 +24,7 @@ gulp.task('browser-sync', function() {
         '/lib': 'lib/'
       }
     },
-    port: 3000
+    port: port
   });
 
   gulp.watch([baseGlob]).on('change', browserSync.reload);

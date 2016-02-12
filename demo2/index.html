@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Kevin Chen, EECS 351 Project</title>
+  </head>
+
+  <body onload="main()">
+    <canvas id="webgl" width="400" height="400">
+    Please use a browser that supports "canvas"
+    </canvas>
+    <p>
+      WASD to move the left bent object.<br/>
+      Mouse drags stops animation and allows you to play with angles of the left shape.<br/>
+      Mouse clicks changes the colors of all the shapes.
+    </p>
+    <button id="reset">Change background color</button>
+
+    <script src="lib/webgl-utils.js"></script>
+    <script src="lib/webgl-debug.js"></script>
+    <script src="lib/cuon-utils.js"></script>
+    <script src="lib/cuon-matrix-mod.js"></script>
+    <script src="drawer.js"></script>
+    <script src="shapes.js"></script>
+    <script src="drawings.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>

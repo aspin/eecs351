@@ -212,7 +212,7 @@ function main() {
     setupKeyboardHandlers(gl, canvas, shapes);
     document.getElementById('reset').onclick = function() {
       var randomColor = new Drawer().getRandomColor();
-      gl.clearColor(randomColor[0], randomColor[1], randomColor[2], 1);
+      gl.clearColor(randomColor[0], randomColor[1], randomColor[2]);
     }
 
     var animate = function() {

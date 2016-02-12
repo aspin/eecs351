@@ -49,7 +49,7 @@ function main() {
 
   // Get the storage location of u_ViewMatrix
   var u_ViewMatrix = gl.getUniformLocation(gl.program, 'u_ViewMatrix');
-  if (!u_ViewMatrix) { 
+  if (!u_ViewMatrix) {
     console.log('Failed to get the storage locations of u_ViewMatrix');
     return;
   }
@@ -73,20 +73,20 @@ function initVertexBuffers(gl) {
     // Vertex coordinates and color(RGBA)
      0.0,  0.5,  -0.4,  0.4,  1.0,  0.4, // The back green one
     -0.5, -0.5,  -0.4,  0.4,  1.0,  0.4,
-     0.5, -0.5,  -0.4,  1.0,  0.4,  0.4, 
-   
+     0.5, -0.5,  -0.4,  1.0,  0.4,  0.4,
+
      0.5,  0.4,  -0.2,  1.0,  0.4,  0.4, // The middle yellow one
     -0.5,  0.4,  -0.2,  1.0,  1.0,  0.4,
-     0.0, -0.6,  -0.2,  1.0,  1.0,  0.4, 
+     0.0, -0.6,  -0.2,  1.0,  1.0,  0.4,
 
-     0.0,  0.5,   0.0,  0.4,  0.4,  1.0,  // The front blue one 
+     0.0,  0.5,   0.0,  0.4,  0.4,  1.0,  // The front blue one
     -0.5, -0.5,   0.0,  0.4,  0.4,  1.0,
-     0.5, -0.5,   0.0,  1.0,  0.4,  0.4, 
+     0.5, -0.5,   0.0,  1.0,  0.4,  0.4,
   ]);
   var n = 9;
 
   // Create a buffer object
-  var vertexColorbuffer = gl.createBuffer();  
+  var vertexColorbuffer = gl.createBuffer();
   if (!vertexColorbuffer) {
     console.log('Failed to create the buffer object');
     return -1;
