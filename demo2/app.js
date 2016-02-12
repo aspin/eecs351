@@ -14,15 +14,8 @@ function main() {
         count = vertices.length / 7;
 
     var viewMatrix = new Matrix4(),
-        modelMatrix = new Matrix4();
-
-    var matrices = bindVariables(gl, vertices);
-    var u_ViewMatrix = matrices[0],
-        u_ModelMatrix = matrices[1];
-
-    // TEST CODE
-    //viewMatrix.setLookAt(0.25, 0.25, 0.25, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
-    gl.uniformMatrix4fv(u_ViewMatrix, false, viewMatrix.elements);
+        modelMatrix = new Matrix4(),
+        u_MvpMatrix = bindVariables(gl, vertices);
 
     var shapes = [];
     shapes.push(new MorningStar(
@@ -50,7 +43,7 @@ function main() {
       //gl.viewport(0, 0, canvas.width, canvas.height);
 
       updateShapes(shapes);
-      draw(gl, modelMatrix, u_ModelMatrix, shapes);
+      draw(gl, modelMatrix, viewMatrix, u_MvpMatrix, shapes);
       requestAnimationFrame(animate, canvas);
     };
     animate();
@@ -131,13 +124,9 @@ function bindVariables(gl, vertices) {
   gl.vertexAttribPointer(a_Color, 3, gl.FLOAT, false, size * 7, size * 4);
   gl.enableVertexAttribArray(a_Color);
 
-  var matrices = [],
-      u_ViewMatrix = gl.getUniformLocation(gl.program, 'u_ViewMatrix');
-      u_ModelMatrix = gl.getUniformLocation(gl.program, 'u_ModelMatrix');
+  var u_MvpMatrix = gl.getUniformLocation(gl.program, 'u_MvpMatrix');
 
-  matrices.push(u_ViewMatrix);
-  matrices.push(u_ModelMatrix);
-  return matrices;
+  return u_MvpMatrix;
 }
 
 function setupMouseHandlers(gl, canvas, shapes) {
@@ -198,25 +187,11 @@ function setupKeyboardHandlers(gl, canvas, shapes) {
   }
 }
 
-function draw(gl, modelMatrix, u_ModelMatrix, shapes) {
+function draw(gl, modelMatrix, viewMatrix, u_MvpMatrix, shapes) {
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
   for(var i in shapes) {
-    shapes[i].draw(gl, modelMatrix, u_ModelMatrix);
+    shapes[i].draw(gl, modelMatrix, viewMatrix, u_MvpMatrix);
   }
-}
-
-function updateMatrices(modelMatrix, location, scale, rotation, origin) {
-  modelMatrix.scale(1, 1, -1);
-  modelMatrix.translate(location.x, location.y, location.z);
-  modelMatrix.translate(-origin.x, -origin.y, -origin.z);
-  modelMatrix.rotate(rotation.x, 0, 1, 0);
-  modelMatrix.rotate(rotation.y, 1, 0, 0);
-  modelMatrix.rotate(rotation.z, 0, 0, 1);
-  modelMatrix.rotate(rotation.xy, 1, 1, 0);
-  modelMatrix.rotate(rotation.yz, 1, 0, 1);
-  modelMatrix.rotate(rotation.xz, 1, 0, 1);
-  modelMatrix.translate(origin.x, origin.y, origin.z);
-  modelMatrix.scale(scale.x, scale.y, scale.z);
 }
 
 function updateShapes(shapes) {
