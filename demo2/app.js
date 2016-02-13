@@ -28,9 +28,10 @@ function main() {
       new Rotation(0, 0, 0, 0, 0, 0)
     ));
 
+    var eye = new Coordinate(0, 0, 2);
 
     setupMouseHandlers(gl, canvas, shapes);
-    setupKeyboardHandlers(gl, canvas, shapes);
+    setupKeyboardHandlers(gl, canvas, shapes, eye);
     document.getElementById('reset').onclick = function() {
       var randomColor = new Drawer().getRandomColor();
       gl.clearColor(randomColor[0], randomColor[1], randomColor[2]);
@@ -43,7 +44,7 @@ function main() {
       //gl.viewport(0, 0, canvas.width, canvas.height);
 
       updateShapes(shapes);
-      draw(gl, canvas, modelMatrix, viewMatrix, projMatrix, u_MvpMatrix, shapes);
+      draw(gl, canvas, modelMatrix, viewMatrix, projMatrix, u_MvpMatrix, shapes, eye);
       requestAnimationFrame(animate, canvas);
     };
     animate();
@@ -164,62 +165,53 @@ function setupMouseHandlers(gl, canvas, shapes) {
   };
 }
 
-function setupKeyboardHandlers(gl, canvas, shapes) {
+function setupKeyboardHandlers(gl, canvas, shapes, eye) {
   var morningStar = shapes[0],
       joint = shapes[1];
 
   window.onkeypress = function (event) {
-    console.log(event.keyCode);
+    //console.log(event.keyCode);
     switch (event.keyCode) {
       case 119: // w, for up
-        joint.out.position.y += 0.01;
+        //joint.out.position.y += 0.01;
+        eye.y += 0.05;
         break;
       case 97: // a, for left
-        joint.out.position.x -= 0.01;
+        //joint.out.position.x -= 0.01;
+        eye.x -= 0.05;
         break;
       case 100: // d, for right
-        joint.out.position.x += 0.01;
+        //joint.out.position.x += 0.01;
+        eye.x += 0.05;
         break;
       case 115: // s, for down
-        joint.out.position.y -= 0.01;
+        //joint.out.position.y -= 0.01;
+        eye.y -= 0.05;
         break;
     }
   }
 }
 
-function draw(gl, canvas, modelMatrix, viewMatrix, projMatrix, u_MvpMatrix, shapes) {
+function draw(gl, canvas, modelMatrix, viewMatrix, projMatrix, u_MvpMatrix, shapes, eye) {
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+  viewMatrix.setLookAt(eye.x, eye.y, eye.z, 0, 0, 0, 0, 1, 0);
 
   gl.viewport(0, 0, canvas.width / 2, canvas.height);
-  projMatrix.setTranslate(0, 0, 0);
+  projMatrix.setPerspective(40, canvas.width / 2 / canvas.height, 1, 100);
   for(var i in shapes) {
-    //viewMatrix.setLookAt(0.25, 0.25, 0.25,
-    //                     0, 0, 0,
-    //                     0, 1, 0);
     shapes[i].draw(gl, modelMatrix, viewMatrix, projMatrix, u_MvpMatrix);
   }
 
   gl.viewport(canvas.width / 2, 0, canvas.width / 2,  canvas.height);
-  var aspect_ratio = canvas.width / canvas.height / 2;
-  var g_near = 0.0, g_far = 1000;
-  projMatrix.setOrtho(-1.0*aspect_ratio, 1.0*aspect_ratio, -1.0, 1.0, g_near, g_far);
+  projMatrix.setOrtho(-1, 1, -1, 1, 0, 1000);
 
   for(var i in shapes) {
-    //viewMatrix.setLookAt(0.25, 0.25, 0.25,
-    //                     0, 0, 0,
-    //                     0, 1, 0);
     shapes[i].draw(gl, modelMatrix, viewMatrix, projMatrix, u_MvpMatrix);
   }
-
-  //modelMatrix.setLookAt(g_EyeX, g_EyeY, g_EyeZ, // eye position
-  //  0, 0, 0, 	// look-at point
-  //  0, 1, 0);									// up vector
-  //gl.uniformMatrix4fv(u_ModelMatrix, false, modelMatrix.elements);
-  //
 }
 
 function updateShapes(shapes) {
-  if (!dragging) {
+  if (!dragging && false) {
     var morningStar = shapes[0];
     var joint = shapes[1];
 

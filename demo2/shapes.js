@@ -187,9 +187,10 @@ function drawThing(gl, modelMatrix, viewMatrix, projMatrix, u_MvpMatrix, start, 
   // cloning projMatrix
   var tempProjMatrix = new Matrix4();
   tempProjMatrix.elements = new Float32Array(projMatrix.elements.slice(0));
+  var tempViewMatrix = new Matrix4();
+  tempViewMatrix.elements = new Float32Array(viewMatrix.elements.slice(0));
 
-  var mvpMatrix = tempProjMatrix.multiply(viewMatrix.multiply(modelMatrix));
-  console.log(mvpMatrix);
+  var mvpMatrix = tempProjMatrix.multiply(tempViewMatrix.multiply(modelMatrix));
   gl.uniformMatrix4fv(u_MvpMatrix, false, mvpMatrix.elements);
   gl.drawArrays(gl.TRIANGLES, start, count);
 }
@@ -222,6 +223,4 @@ function updateMatrices(modelMatrix, viewMatrix, projMatrix, location, scale, ro
   modelMatrix.rotate(rotation.xz, 1, 0, 1);
   modelMatrix.translate(origin.x, origin.y, origin.z);
   modelMatrix.scale(scale.x, scale.y, scale.z);
-
-  viewMatrix.setLookAt(0.20, 0.25, 0.25, 0, 0, 0, 0, 1, 0);
 }
