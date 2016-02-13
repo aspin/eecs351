@@ -3,18 +3,17 @@ var VSHADER = 'vShared',
 
 var SPIN_CONSTANT = 0.5;
 var dragging = false,
-    extend = true,
     swingLeft = true;
 
 function main() {
   loadShaders(function(sources) {
     var canvas = document.getElementById('webgl'),
         gl = initWebGL(canvas, sources),
-        vertices = getVertices(),
-        count = vertices.length / 7;
+        vertices = getVertices();
 
-    var viewMatrix = new Matrix4(),
-        modelMatrix = new Matrix4(),
+    var modelMatrix = new Matrix4(),
+        viewMatrix = new Matrix4(),
+        projMatrix = new Matrix4(),
         u_MvpMatrix = bindVariables(gl, vertices);
 
     var shapes = [];
@@ -29,6 +28,7 @@ function main() {
       new Rotation(0, 0, 0, 0, 0, 0)
     ));
 
+
     setupMouseHandlers(gl, canvas, shapes);
     setupKeyboardHandlers(gl, canvas, shapes);
     document.getElementById('reset').onclick = function() {
@@ -38,12 +38,12 @@ function main() {
 
     var animate = function() {
       // Autostretch
-      //canvas.height = window.innerHeight;
-      //canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      canvas.width = window.innerWidth;
       //gl.viewport(0, 0, canvas.width, canvas.height);
 
       updateShapes(shapes);
-      draw(gl, modelMatrix, viewMatrix, u_MvpMatrix, shapes);
+      draw(gl, canvas, modelMatrix, viewMatrix, projMatrix, u_MvpMatrix, shapes);
       requestAnimationFrame(animate, canvas);
     };
     animate();
@@ -187,11 +187,35 @@ function setupKeyboardHandlers(gl, canvas, shapes) {
   }
 }
 
-function draw(gl, modelMatrix, viewMatrix, u_MvpMatrix, shapes) {
+function draw(gl, canvas, modelMatrix, viewMatrix, projMatrix, u_MvpMatrix, shapes) {
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+  gl.viewport(0, 0, canvas.width / 2, canvas.height);
+  projMatrix.setTranslate(0, 0, 0);
   for(var i in shapes) {
-    shapes[i].draw(gl, modelMatrix, viewMatrix, u_MvpMatrix);
+    //viewMatrix.setLookAt(0.25, 0.25, 0.25,
+    //                     0, 0, 0,
+    //                     0, 1, 0);
+    shapes[i].draw(gl, modelMatrix, viewMatrix, projMatrix, u_MvpMatrix);
   }
+
+  gl.viewport(canvas.width / 2, 0, canvas.width / 2,  canvas.height);
+  var aspect_ratio = canvas.width / canvas.height / 2;
+  var g_near = 0.0, g_far = 1000;
+  projMatrix.setOrtho(-1.0*aspect_ratio, 1.0*aspect_ratio, -1.0, 1.0, g_near, g_far);
+
+  for(var i in shapes) {
+    //viewMatrix.setLookAt(0.25, 0.25, 0.25,
+    //                     0, 0, 0,
+    //                     0, 1, 0);
+    shapes[i].draw(gl, modelMatrix, viewMatrix, projMatrix, u_MvpMatrix);
+  }
+
+  //modelMatrix.setLookAt(g_EyeX, g_EyeY, g_EyeZ, // eye position
+  //  0, 0, 0, 	// look-at point
+  //  0, 1, 0);									// up vector
+  //gl.uniformMatrix4fv(u_ModelMatrix, false, modelMatrix.elements);
+  //
 }
 
 function updateShapes(shapes) {
