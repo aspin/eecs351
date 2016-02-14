@@ -28,8 +28,13 @@ function main() {
       new Rotation(0, 0, 0, 0, 0, 0)
     ));
     shapes.push(new GroundGrid());
+    shapes.push(new Axes());
 
-    var eye = new Coordinate(0.2, 0.2, 4);
+    var eye = new Eye(
+      new Coordinate(2.0, 2.0, 0.2),
+      new Coordinate(0.0, 0.0, 0.0),
+      new Coordinate(0.0, 0.0, 1.0)
+    );
 
     setupMouseHandlers(gl, canvas, shapes);
     setupKeyboardHandlers(gl, canvas, shapes, eye);
@@ -148,7 +153,9 @@ function setupMouseHandlers(gl, canvas, shapes) {
 
   canvas.onmouseup = function(event) {
     dragging = false;
-    vertices = getVertices();
+    var vertices = getVertices();
+    var a_Color = gl.getAttribLocation(gl.program, 'a_Color');
+    var size = vertices.BYTES_PER_ELEMENT;
     gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
     gl.vertexAttribPointer(a_Color, 3, gl.FLOAT, false, size * 7, size * 4);
   };
@@ -171,23 +178,37 @@ function setupKeyboardHandlers(gl, canvas, shapes, eye) {
       joint = shapes[1];
 
   window.onkeypress = function (event) {
-    //console.log(event.keyCode);
     switch (event.keyCode) {
       case 119: // w, for up
         //joint.out.position.y += 0.01;
-        eye.y += 0.05;
+        eye.position.z += 0.05;
         break;
       case 97: // a, for left
         //joint.out.position.x -= 0.01;
-        eye.x -= 0.05;
+        eye.position.x -= 0.05;
         break;
       case 100: // d, for right
         //joint.out.position.x += 0.01;
-        eye.x += 0.05;
+        eye.position.x += 0.05;
         break;
       case 115: // s, for down
         //joint.out.position.y -= 0.01;
-        eye.y -= 0.05;
+        eye.position.z -= 0.05;
+        break;
+      case 105: // i, for camera up
+        eye.looking.z += 0.01;
+        break;
+      case 106: //j, for camera left
+        eye.looking.x -= 0.01;
+        break;
+      case 107: // k, for camera down
+        eye.looking.z -= 0.01;
+        break;
+      case 108: // l, for camera right
+        eye.looking.x += 0.01;
+        break;
+      default:
+        console.log(event.keyCode);
         break;
     }
   }
@@ -195,7 +216,9 @@ function setupKeyboardHandlers(gl, canvas, shapes, eye) {
 
 function draw(gl, canvas, modelMatrix, viewMatrix, projMatrix, u_MvpMatrix, shapes, eye) {
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-  viewMatrix.setLookAt(eye.x, eye.y, eye.z, 0, 0, 0, 0, 1, 0);
+  viewMatrix.setLookAt(eye.position.x, eye.position.y, eye.position.z,
+                       eye.looking.x, eye.looking.y, eye.looking.z,
+                       eye.up.x, eye.up.y, eye.up.z);
   var aspectRatio = canvas.width / canvas.height / 2;
 
   gl.viewport(0, 0, canvas.width / 2, canvas.height);

@@ -10,15 +10,30 @@ function Rotation(x, y, z, xy, xz, yz) {
   this.yz = yz;
 }
 
+function Eye(position, looking, up) {
+  this.position = position;
+  this.looking = looking;
+  this.up = up;
+}
+
+function Axes() {
+  this.start = 192;
+  this.size = 6;
+}
+
+Axes.prototype.draw = function(gl, modelMatrix, viewMatrix, projMatrix, u_MvpMatrix) {
+  modelMatrix.setTranslate(0, 0, 0);
+  injectMvpMatrix(gl, modelMatrix, viewMatrix, projMatrix, u_MvpMatrix);
+  gl.drawArrays(gl.LINES, this.start, this.size);
+};
 
 function GroundGrid() {
-  this.start = 192;
+  this.start = 198;
   this.size = 400;
 }
 
 GroundGrid.prototype.draw = function(gl, modelMatrix, viewMatrix, projMatrix, u_MvpMatrix) {
   modelMatrix.setTranslate(0, 0, 0);
-  modelMatrix.scale(1, 1, -1);
   injectMvpMatrix(gl, modelMatrix, viewMatrix, projMatrix, u_MvpMatrix);
   gl.drawArrays(gl.LINES, this.start, this.size);
 };
@@ -228,7 +243,7 @@ function drawMultiPyramid(gl, modelMatrix, viewMatrix, projMatrix, u_MvpMatrix, 
 }
 
 function updateMatrices(modelMatrix, viewMatrix, projMatrix, location, scale, rotation, origin) {
-  modelMatrix.scale(1, 1, -1);
+  //modelMatrix.scale(1, 1, -1);
   modelMatrix.translate(location.x, location.y, location.z);
   modelMatrix.translate(-origin.x, -origin.y, -origin.z);
   modelMatrix.rotate(rotation.x, 0, 1, 0);
