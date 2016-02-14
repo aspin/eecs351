@@ -18,12 +18,12 @@ function main() {
 
     var shapes = [];
     shapes.push(new MorningStar(
-      new Coordinate(0.4, 0.4, 0.0),
+      new Coordinate(0.8, 0.8, 0.1),
       0.3,
       new Rotation(-0.3, -0.3, -0.3, 0, 0, 0)
     ));
     shapes.push(new Joint(
-      new Coordinate(-0.5, -0.5, 0.0),
+      new Coordinate(-0.8, -0.8, 0.1),
       0.2,
       new Rotation(0, 0, 0, 0, 0, 0)
     ));
@@ -31,7 +31,7 @@ function main() {
     shapes.push(new Axes());
 
     var eye = new Eye(
-      new Coordinate(2.0, 2.0, 0.2),
+      new Coordinate(3.0, 2.0, 1.5),
       new Coordinate(0.0, 0.0, 0.0),
       new Coordinate(0.0, 0.0, 1.0)
     );
@@ -236,13 +236,13 @@ function draw(gl, canvas, modelMatrix, viewMatrix, projMatrix, u_MvpMatrix, shap
 }
 
 function updateShapes(shapes) {
-  if (!dragging && false) {
+  if (!dragging) {
     var morningStar = shapes[0];
     var joint = shapes[1];
 
-    morningStar.slider.rotation.x += 4;
-    morningStar.slider.rotation.y += 0.1;
-    morningStar.handle.rotation.x -= SPIN_CONSTANT;
+    //morningStar.slider.rotation.x += 4;
+    //morningStar.slider.rotation.y += 0.1;
+    //morningStar.handle.rotation.x -= SPIN_CONSTANT;
     morningStar.ball.rotation.x -= 2;
 
     if (swingLeft) {
@@ -257,10 +257,10 @@ function updateShapes(shapes) {
       swingLeft = morningStar.handle.rotation.z > 40;
     }
 
-    joint.out.rotation.z -= 1;
-    joint.out.rotation.y -= 1;
-    joint.bend.rotation.y -= 1;
-    joint.bend2.rotation.x -= 1;
+    //joint.out.rotation.z -= 1;
+    //joint.out.rotation.y -= 1;
+    //joint.bend.rotation.y -= 1;
+    //joint.bend2.rotation.x -= 1;
     joint.end.rotation.x -= 3;
   }
 }

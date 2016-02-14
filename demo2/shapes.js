@@ -23,8 +23,12 @@ function Axes() {
 
 Axes.prototype.draw = function(gl, modelMatrix, viewMatrix, projMatrix, u_MvpMatrix) {
   modelMatrix.setTranslate(0, 0, 0);
-  injectMvpMatrix(gl, modelMatrix, viewMatrix, projMatrix, u_MvpMatrix);
-  gl.drawArrays(gl.LINES, this.start, this.size);
+  drawAxes(gl, modelMatrix, viewMatrix, projMatrix, u_MvpMatrix,
+    new Coordinate(0, 0, 0.1),
+    new Coordinate(4, 4, 4),
+    new Rotation(0, 0, 0, 0, 0, 0),
+    new Coordinate(0, 0, 0)
+  );
 };
 
 function GroundGrid() {
@@ -96,6 +100,14 @@ MorningStar.prototype.draw = function(gl, modelMatrix, viewMatrix, projMatrix, u
   drawSpike(gl, modelMatrix, viewMatrix, projMatrix, u_MvpMatrix,
     new Coordinate(this.ball.position.x, this.ball.position.y, this.ball.position.z),
     new Coordinate(this.ball.scale.x, this.ball.scale.y, this.ball.scale.z),
+    new Rotation(this.ball.rotation.x, this.ball.rotation.y, this.ball.rotation.z,
+      this.ball.rotation.xy, this.ball.rotation.xz, this.ball.rotation.yz),
+    new Coordinate(this.ball.origin.x, this.ball.origin.y, this.ball.origin.z));
+
+  undoScale(this.ball, modelMatrix);
+  drawAxes(gl, modelMatrix, viewMatrix, projMatrix, u_MvpMatrix,
+    new Coordinate(0, 0, 0),
+    new Coordinate(1, 1, 1),
     new Rotation(this.ball.rotation.x, this.ball.rotation.y, this.ball.rotation.z,
       this.ball.rotation.xy, this.ball.rotation.xz, this.ball.rotation.yz),
     new Coordinate(this.ball.origin.x, this.ball.origin.y, this.ball.origin.z));
@@ -240,6 +252,12 @@ function drawSpike(gl, modelMatrix, viewMatrix, projMatrix, u_MvpMatrix, locatio
 function drawMultiPyramid(gl, modelMatrix, viewMatrix, projMatrix, u_MvpMatrix, location, scale, rotation, origin) {
   updateMatrices(modelMatrix, viewMatrix, projMatrix, location, scale, rotation, origin);
   drawThing(gl, modelMatrix, viewMatrix, projMatrix, u_MvpMatrix, 96, 96);
+}
+
+function drawAxes(gl, modelMatrix, viewMatrix, projMatrix, u_MvpMatrix, location, scale, rotation, origin) {
+  updateMatrices(modelMatrix, viewMatrix, projMatrix, location, scale, rotation, origin);
+  injectMvpMatrix(gl, modelMatrix, viewMatrix, projMatrix, u_MvpMatrix);
+  gl.drawArrays(gl.LINES, 192, 6);
 }
 
 function updateMatrices(modelMatrix, viewMatrix, projMatrix, location, scale, rotation, origin) {
