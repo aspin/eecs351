@@ -27,8 +27,9 @@ function main() {
       0.2,
       new Rotation(0, 0, 0, 0, 0, 0)
     ));
+    shapes.push(new GroundGrid());
 
-    var eye = new Coordinate(0, 0, 2);
+    var eye = new Coordinate(0.2, 0.2, 4);
 
     setupMouseHandlers(gl, canvas, shapes);
     setupKeyboardHandlers(gl, canvas, shapes, eye);
@@ -195,15 +196,16 @@ function setupKeyboardHandlers(gl, canvas, shapes, eye) {
 function draw(gl, canvas, modelMatrix, viewMatrix, projMatrix, u_MvpMatrix, shapes, eye) {
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
   viewMatrix.setLookAt(eye.x, eye.y, eye.z, 0, 0, 0, 0, 1, 0);
+  var aspectRatio = canvas.width / canvas.height / 2;
 
   gl.viewport(0, 0, canvas.width / 2, canvas.height);
-  projMatrix.setPerspective(40, canvas.width / 2 / canvas.height, 1, 100);
+  projMatrix.setPerspective(40, aspectRatio, 1, 100);
   for(var i in shapes) {
     shapes[i].draw(gl, modelMatrix, viewMatrix, projMatrix, u_MvpMatrix);
   }
 
   gl.viewport(canvas.width / 2, 0, canvas.width / 2,  canvas.height);
-  projMatrix.setOrtho(-1, 1, -1, 1, 0, 1000);
+  projMatrix.setOrtho(-1 * aspectRatio, aspectRatio, -1, 1, 0, 1000);
 
   for(var i in shapes) {
     shapes[i].draw(gl, modelMatrix, viewMatrix, projMatrix, u_MvpMatrix);

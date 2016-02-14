@@ -131,5 +131,34 @@ function getVertices() {
   }
 
   var triangles = rectangleTris.concat(icosaTriangles).concat(starTriangles);
-  return drawUtil.exportTriangles(triangles);
+  var trianglesArray = drawUtil.exportTriangles(triangles);
+  
+  console.log(trianglesArray.length);
+
+  var i,
+      vertex,
+      min = -50,
+      max = 50;
+  var groundVertices = new Float32Array(7 * 2 * 2 * 100); // 100 lines, x and y direction
+
+  // x lines
+  for(i = 0; i < 100; i++) {
+    vertex = [i + min, min, 0.0, 1.0, 1.0, 1.0, 0.3,
+                  i + min, max, 0.0, 1.0, 1.0, 1.0, 0.3];
+    groundVertices.set(vertex, i * 14);
+  }
+
+  // y lines
+  for(i = 0; i < 100; i++) {
+    vertex = [min, i + min, 0.0, 1.0, 0.5, 1.0, 0.5,
+                  max, i + min, 0.0, 1.0, 0.5, 1.0, 0.5];
+    groundVertices.set(vertex, (i + 100) * 14);
+  }
+  
+  console.log(groundVertices);
+
+  var finalArray = new Float32Array(trianglesArray.length + groundVertices.length);
+  finalArray.set(trianglesArray);
+  finalArray.set(groundVertices, trianglesArray.length);
+  return finalArray;
 }

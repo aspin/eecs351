@@ -10,6 +10,19 @@ function Rotation(x, y, z, xy, xz, yz) {
   this.yz = yz;
 }
 
+
+function GroundGrid() {
+  this.start = 192;
+  this.size = 400;
+}
+
+GroundGrid.prototype.draw = function(gl, modelMatrix, viewMatrix, projMatrix, u_MvpMatrix) {
+  modelMatrix.setTranslate(0, 0, 0);
+  modelMatrix.scale(1, 1, -1);
+  injectMvpMatrix(gl, modelMatrix, viewMatrix, projMatrix, u_MvpMatrix);
+  gl.drawArrays(gl.LINES, this.start, this.size);
+};
+
 // @params Cordinate, Scalar, Coordinate
 function MorningStar(position, scale, rotation) {
   this.slider = new Rectangle(
@@ -183,15 +196,18 @@ function MultiPyramid(position, scale, rotation, origin) {
  this.origin = origin;
 }
 
-function drawThing(gl, modelMatrix, viewMatrix, projMatrix, u_MvpMatrix, start, count) {
+function injectMvpMatrix(gl, modelMatrix, viewMatrix, projMatrix, u_MvpMatrix) {
   // cloning projMatrix
   var tempProjMatrix = new Matrix4();
   tempProjMatrix.elements = new Float32Array(projMatrix.elements.slice(0));
   var tempViewMatrix = new Matrix4();
   tempViewMatrix.elements = new Float32Array(viewMatrix.elements.slice(0));
-
   var mvpMatrix = tempProjMatrix.multiply(tempViewMatrix.multiply(modelMatrix));
   gl.uniformMatrix4fv(u_MvpMatrix, false, mvpMatrix.elements);
+}
+
+function drawThing(gl, modelMatrix, viewMatrix, projMatrix, u_MvpMatrix, start, count) {
+  injectMvpMatrix(gl, modelMatrix, viewMatrix, projMatrix, u_MvpMatrix);
   gl.drawArrays(gl.TRIANGLES, start, count);
 }
 
