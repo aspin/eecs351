@@ -133,35 +133,33 @@ function getVertices() {
   var triangles = rectangleTris.concat(icosaTriangles).concat(starTriangles);
   var trianglesArray = drawUtil.exportTriangles(triangles);
   
-  console.log(trianglesArray.length);
-
   var i,
       vertex,
       min = -50,
       max = 50;
-  var groundVertices = new Float32Array(6 * 2 * 2 * 100); // 100 lines, x and y direction
+  var groundVertices = new Float32Array(9 * 2 * 2 * 100); // 100 lines, x and y direction
 
-  // x lines
+  // x lines, light from all angles
   for(i = 0; i < 100; i++) {
-    vertex = new Float32Array([i + min, min, 0.0, 1.0, 1.0, 0.3,
-                               i + min, max, 0.0, 1.0, 1.0, 0.3]);
-    groundVertices.set(vertex, i * 12);
+    vertex = new Float32Array([i + min, min, 0.0, 1.0, 1.0, 0.3, 1.0, 1.0, 1.0,
+                               i + min, max, 0.0, 1.0, 1.0, 0.3, 1.0, 1.0, 1.0]);
+    groundVertices.set(vertex, i * 18);
   }
 
   // y lines
   for(i = 0; i < 100; i++) {
-    vertex = new Float32Array([min, i + min, 0.0, 0.5, 1.0, 0.5,
-                               max, i + min, 0.0, 0.5, 1.0, 0.5]);
-    groundVertices.set(vertex, (i + 100) * 12);
+    vertex = new Float32Array([min, i + min, 0.0, 0.5, 1.0, 0.5, 1.0, 1.0, 1.0,
+                               max, i + min, 0.0, 0.5, 1.0, 0.5, 1.0, 1.0, 1.0]);
+    groundVertices.set(vertex, (i + 100) * 18);
   }
 
   var axesVertices = new Float32Array([
-    1.0, 0.0, 0.0, 1.0, 0.0, 0.0,
-    -1.0, 0.0, 0.0, 1.0, 0.0, 0.0,
-    0.0, 1.0, 0.0, 0.0, 1.0, 0.0,
-    0.0, -1.0, 0.0, 0.0, 1.0, 0.0,
-    0.0, 0.0, 1.0, 0.0, 0.0, 1.0,
-    0.0, 0.0, -1.0, 0.0, 0.0, 1.0
+    1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 1.0, 1.0,
+    -1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 1.0, 1.0,
+    0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 1.0,
+    0.0, -1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 1.0,
+    0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0,
+    0.0, 0.0, -1.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0
   ]);
 
   var finalArray = new Float32Array(trianglesArray.length + axesVertices.length + groundVertices.length);

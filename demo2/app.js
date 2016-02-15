@@ -14,7 +14,11 @@ function main() {
     var modelMatrix = new Matrix4(),
         viewMatrix = new Matrix4(),
         projMatrix = new Matrix4(),
-        u_MvpMatrix = bindVariables(gl, vertices);
+        normalMatrix = new Matrix4();
+
+    var matrices = bindVariables(gl, vertices),
+        u_MvpMatrix = matrices[0],
+        u_NormalMatrix = matrices[1];
 
     var shapes = [];
     shapes.push(new MorningStar(
@@ -38,10 +42,6 @@ function main() {
 
     setupMouseHandlers(gl, canvas, shapes);
     setupKeyboardHandlers(gl, canvas, shapes, eye);
-    document.getElementById('reset').onclick = function() {
-      var randomColor = new Drawer().getRandomColor();
-      gl.clearColor(randomColor[0], randomColor[1], randomColor[2]);
-    };
 
     var animate = function() {
       // Autostretch
@@ -50,7 +50,7 @@ function main() {
       //gl.viewport(0, 0, canvas.width, canvas.height);
 
       updateShapes(shapes);
-      draw(gl, canvas, modelMatrix, viewMatrix, projMatrix, u_MvpMatrix, shapes, eye);
+      draw(gl, canvas, modelMatrix, viewMatrix, projMatrix, normalMatrix, u_MvpMatrix, u_NormalMatrix, shapes, eye);
       requestAnimationFrame(animate, canvas);
     };
     animate();
@@ -89,9 +89,9 @@ function loadShaders(callback) {
 
   // FOR HTML OPEN:
   //var sources = {};
-  //sources[FSHADER] = 'precision mediump float;\nvarying vec4 v_Color;\nvoid main() {\ngl_FragColor = v_Color;\n}\n';
+  //sources[FSHADER] = 'precisionV mediump float;\nvarying vec4 v_Color;\nvoid main() {\ngl_FragColor = v_Color;\n}\n';
   //sources[VSHADER] = 'attribute vec4 a_Position;\nuniform mat4 u_ModelMatrix;\nattribute vec4 a_Color;\nvarying vec4 v_Color;\nvoid main() {\ngl_Position = u_ModelMatrix * a_Position;\ngl_PointSize = 10.0;\nv_Color = a_Color;\n}\n ';
-  callback(sources);
+  //callback(sources);
 }
 
 function initWebGL(canvas, sources) {
@@ -105,6 +105,14 @@ function initWebGL(canvas, sources) {
   gl.clearColor(0, 0, 0, 1);
 	gl.depthFunc(gl.LESS);
   gl.enable(gl.DEPTH_TEST);
+
+  var u_LightDirection = gl.getUniformLocation(gl.program, 'u_LightDirection');
+  if (!u_LightDirection) {
+    throw 'Failed to get u_LightDirection';
+  }
+  var lightDirection = new Vector3([0.0, 0.0, 1.0]);
+  lightDirection.normalize();
+  gl.uniform3fv(u_LightDirection, lightDirection.elements);
   return gl;
 }
 
@@ -121,19 +129,27 @@ function bindVariables(gl, vertices) {
   if (a_Position < 0) {
     throw 'Failed to get a_Position';
   }
-  gl.vertexAttribPointer(a_Position, 3, gl.FLOAT, false, size * 6, 0);
+  gl.vertexAttribPointer(a_Position, 3, gl.FLOAT, false, size * 9, 0);
   gl.enableVertexAttribArray(a_Position);
 
   var a_Color = gl.getAttribLocation(gl.program, 'a_Color');
   if (a_Color < 0) {
     throw 'Failed to get a_Color';
   }
-  gl.vertexAttribPointer(a_Color, 3, gl.FLOAT, false, size * 6, size * 3);
+  gl.vertexAttribPointer(a_Color, 3, gl.FLOAT, false, size * 9, size * 3);
   gl.enableVertexAttribArray(a_Color);
 
-  var u_MvpMatrix = gl.getUniformLocation(gl.program, 'u_MvpMatrix');
+  var a_Normal = gl.getAttribLocation(gl.program, 'a_Normal');
+  if (a_Normal < 0) {
+    throw 'Failed to get a_Normal';
+  }
+  gl.vertexAttribPointer(a_Normal, 3, gl.FLOAT, false, size * 9, size * 6);
+  gl.enableVertexAttribArray(a_Normal);
 
-  return u_MvpMatrix;
+  var u_MvpMatrix = gl.getUniformLocation(gl.program, 'u_MvpMatrix');
+  var u_NormalMatrix = gl.getUniformLocation(gl.program, 'u_NormalMatrix');
+
+  return [ u_MvpMatrix, u_NormalMatrix ];
 }
 
 function setupMouseHandlers(gl, canvas, shapes) {
@@ -157,7 +173,7 @@ function setupMouseHandlers(gl, canvas, shapes) {
     var a_Color = gl.getAttribLocation(gl.program, 'a_Color');
     var size = vertices.BYTES_PER_ELEMENT;
     gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
-    gl.vertexAttribPointer(a_Color, 3, gl.FLOAT, false, size * 6, size * 3);
+    gl.vertexAttribPointer(a_Color, 3, gl.FLOAT, false, size * 9, size * 3);
   };
 
   canvas.onmousemove = function(event) {
@@ -214,7 +230,7 @@ function setupKeyboardHandlers(gl, canvas, shapes, eye) {
   }
 }
 
-function draw(gl, canvas, modelMatrix, viewMatrix, projMatrix, u_MvpMatrix, shapes, eye) {
+function draw(gl, canvas, modelMatrix, viewMatrix, projMatrix, normalMatrix, u_MvpMatrix, u_NormalMatrix, shapes, eye) {
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
   viewMatrix.setLookAt(eye.position.x, eye.position.y, eye.position.z,
                        eye.looking.x, eye.looking.y, eye.looking.z,
@@ -224,14 +240,14 @@ function draw(gl, canvas, modelMatrix, viewMatrix, projMatrix, u_MvpMatrix, shap
   gl.viewport(0, 0, canvas.width / 2, canvas.height);
   projMatrix.setPerspective(40, aspectRatio, 1, 100);
   for(var i in shapes) {
-    shapes[i].draw(gl, modelMatrix, viewMatrix, projMatrix, u_MvpMatrix);
+    shapes[i].draw(gl, modelMatrix, viewMatrix, projMatrix, normalMatrix, u_MvpMatrix, u_NormalMatrix);
   }
 
   gl.viewport(canvas.width / 2, 0, canvas.width / 2,  canvas.height);
   projMatrix.setOrtho(-1 * aspectRatio, aspectRatio, -1, 1, 0, 1000);
 
   for(var i in shapes) {
-    shapes[i].draw(gl, modelMatrix, viewMatrix, projMatrix, u_MvpMatrix);
+    shapes[i].draw(gl, modelMatrix, viewMatrix, projMatrix, normalMatrix, u_MvpMatrix, u_NormalMatrix);
   }
 }
 
