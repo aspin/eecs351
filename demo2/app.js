@@ -121,14 +121,14 @@ function bindVariables(gl, vertices) {
   if (a_Position < 0) {
     throw 'Failed to get a_Position';
   }
-  gl.vertexAttribPointer(a_Position, 4, gl.FLOAT, false, size * 7, 0);
+  gl.vertexAttribPointer(a_Position, 3, gl.FLOAT, false, size * 6, 0);
   gl.enableVertexAttribArray(a_Position);
 
   var a_Color = gl.getAttribLocation(gl.program, 'a_Color');
   if (a_Color < 0) {
     throw 'Failed to get a_Color';
   }
-  gl.vertexAttribPointer(a_Color, 3, gl.FLOAT, false, size * 7, size * 4);
+  gl.vertexAttribPointer(a_Color, 3, gl.FLOAT, false, size * 6, size * 3);
   gl.enableVertexAttribArray(a_Color);
 
   var u_MvpMatrix = gl.getUniformLocation(gl.program, 'u_MvpMatrix');
@@ -157,7 +157,7 @@ function setupMouseHandlers(gl, canvas, shapes) {
     var a_Color = gl.getAttribLocation(gl.program, 'a_Color');
     var size = vertices.BYTES_PER_ELEMENT;
     gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
-    gl.vertexAttribPointer(a_Color, 3, gl.FLOAT, false, size * 7, size * 4);
+    gl.vertexAttribPointer(a_Color, 3, gl.FLOAT, false, size * 6, size * 3);
   };
 
   canvas.onmousemove = function(event) {

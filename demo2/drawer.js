@@ -5,7 +5,7 @@ function Drawer() {
 }
 
 Drawer.prototype.addVertex = function(id, x, y, z) {
-  this.vertices[id] = [x, y, z, 1.0];
+  this.vertices[id] = [x, y, z];
 };
 
 Drawer.prototype.addTriangle = function(id, p1, p2, p3) {

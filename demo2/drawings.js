@@ -139,29 +139,29 @@ function getVertices() {
       vertex,
       min = -50,
       max = 50;
-  var groundVertices = new Float32Array(7 * 2 * 2 * 100); // 100 lines, x and y direction
+  var groundVertices = new Float32Array(6 * 2 * 2 * 100); // 100 lines, x and y direction
 
   // x lines
   for(i = 0; i < 100; i++) {
-    vertex = new Float32Array([i + min, min, 0.0, 1.0, 1.0, 1.0, 0.3,
-                               i + min, max, 0.0, 1.0, 1.0, 1.0, 0.3]);
-    groundVertices.set(vertex, i * 14);
+    vertex = new Float32Array([i + min, min, 0.0, 1.0, 1.0, 0.3,
+                               i + min, max, 0.0, 1.0, 1.0, 0.3]);
+    groundVertices.set(vertex, i * 12);
   }
 
   // y lines
   for(i = 0; i < 100; i++) {
-    vertex = new Float32Array([min, i + min, 0.0, 1.0, 0.5, 1.0, 0.5,
-                               max, i + min, 0.0, 1.0, 0.5, 1.0, 0.5]);
-    groundVertices.set(vertex, (i + 100) * 14);
+    vertex = new Float32Array([min, i + min, 0.0, 0.5, 1.0, 0.5,
+                               max, i + min, 0.0, 0.5, 1.0, 0.5]);
+    groundVertices.set(vertex, (i + 100) * 12);
   }
 
   var axesVertices = new Float32Array([
-    1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0,
-    -1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0,
-    0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0,
-    0.0, -1.0, 0.0, 1.0, 0.0, 1.0, 0.0,
-    0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 1.0,
-    0.0, 0.0, -1.0, 1.0, 0.0, 0.0, 1.0
+    1.0, 0.0, 0.0, 1.0, 0.0, 0.0,
+    -1.0, 0.0, 0.0, 1.0, 0.0, 0.0,
+    0.0, 1.0, 0.0, 0.0, 1.0, 0.0,
+    0.0, -1.0, 0.0, 0.0, 1.0, 0.0,
+    0.0, 0.0, 1.0, 0.0, 0.0, 1.0,
+    0.0, 0.0, -1.0, 0.0, 0.0, 1.0
   ]);
 
   var finalArray = new Float32Array(trianglesArray.length + axesVertices.length + groundVertices.length);
