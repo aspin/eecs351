@@ -166,7 +166,36 @@ function getVertices() {
     starTriangles.push('se' + i);
   }
 
-  var triangles = rectangleTris.concat(icosaTriangles).concat(starTriangles);
+  // pyramid
+  drawUtil.addVertex('ptop', 0.0, 0.0, 1);
+  drawUtil.addVertex('plb', -1.0, -1.0, 0.0);
+  drawUtil.addVertex('prb', 1.0, -1.0, 0.0);
+  drawUtil.addVertex('plf', -1.0, 1.0, 0.0);
+  drawUtil.addVertex('prf', 1.0, 1.0, 0.0);
+
+  drawUtil.addTriangle('ptl', 'ptop', 'plf', 'plb');
+  drawUtil.addTriangle('ptb', 'ptop', 'plb', 'prb');
+  drawUtil.addTriangle('ptr', 'ptop', 'prf', 'prb');
+  drawUtil.addTriangle('ptf', 'ptop', 'plf', 'prf');
+  drawUtil.addTriangle('ptbs1', 'plb', 'plf', 'prf');
+  drawUtil.addTriangle('ptbs2', 'plb', 'prb', 'prf');
+
+  drawUtil.addNormal('ptl', -1.0, 0, 1.0);
+  drawUtil.addNormal('ptb', 0, -1.0, 1.0);
+  drawUtil.addNormal('ptr', 1.0, 0, 1.0);
+  drawUtil.addNormal('ptf', 0, 1.0, 1.0);
+  drawUtil.addNormal('ptbs1', 0.0, 0.0, -1);
+  drawUtil.addNormal('ptbs2', 0.0, 0.0, -1);
+
+  var pTriangles = [];
+  pTriangles.push('ptl');
+  pTriangles.push('ptb');
+  pTriangles.push('ptr');
+  pTriangles.push('ptf');
+  pTriangles.push('ptbs1');
+  pTriangles.push('ptbs2');
+
+  var triangles = rectangleTris.concat(icosaTriangles).concat(starTriangles).concat(pTriangles);
   var trianglesArray = drawUtil.exportTriangles(triangles);
   
   var vertex,

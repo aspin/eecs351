@@ -31,12 +31,27 @@ function main() {
       0.2,
       new Rotation(0, 0, 0, 0, 0, 0)
     ));
+    shapes.push(new Cube(
+      new Coordinate(-0.8, 0.8, 0.1),
+      0.1,
+      new Rotation(0, 0, 0, 0, 0, 0)
+    ));
+    shapes.push(new Pyramid(
+      new Coordinate(0.8, -1, 0.1),
+      0.1,
+      new Rotation(0, 0, 0, 0, 0, 0)
+    ));
+    shapes.push(new House(
+      new Coordinate(1.5, 1.5, 0.1),
+      0.2,
+      new Rotation(0, 0, 0, 0, 0, 0)
+    ));
     shapes.push(new GroundGrid());
     shapes.push(new Axes());
 
     var eye = new Eye(
       new Coordinate(3.0, 2.0, 1.5),
-      new Coordinate(0.0, 0.0, 0.0),
+      new Coordinate(0.0, 0.0, 1.5),
       new Coordinate(0.0, 0.0, 1.0)
     );
 
@@ -189,6 +204,38 @@ function setupMouseHandlers(gl, canvas, shapes) {
   };
 }
 
+
+var angle = 0;
+var offset = 5.4 * Math.PI / 4;
+function computePosition(eye, angle) {
+  var distance = computeEyeDistance(eye);
+  var position = [ eye.position.x + distance * Math.cos(angle + offset),
+                   eye.position.y + distance * Math.sin(angle + offset)];
+  return position;
+};
+
+function computeEyeDistance(eye) {
+  var vector = [ eye.position.x - eye.looking.x, eye.position.y - eye.looking.y ];
+  var distance = Math.sqrt(Math.pow(vector[0], 2) + Math.pow(vector[1], 2));
+  return distance;
+}
+
+function computeMovement(eye, scale) {
+  var vector = { x: eye.position.x - eye.looking.x,
+                 y: eye.position.y - eye.looking.y,
+                 z: eye.position.z - eye.looking.z };
+  var magnitude = Math.sqrt(
+    Math.pow(vector.x, 2) +
+    Math.pow(vector.y, 2) +
+    Math.pow(vector.z, 2)
+  );
+  magnitude += scale;
+  vector.x /= magnitude;
+  vector.y /= magnitude;
+  vector.z /= magnitude;
+  return vector;
+}
+
 function setupKeyboardHandlers(gl, canvas, shapes, eye) {
   var morningStar = shapes[0],
       joint = shapes[1];
@@ -196,32 +243,35 @@ function setupKeyboardHandlers(gl, canvas, shapes, eye) {
   window.onkeypress = function (event) {
     switch (event.keyCode) {
       case 119: // w, for up
-        //joint.out.position.y += 0.01;
-        eye.position.z += 0.05;
+        eye.looking.z += 0.5;
         break;
       case 97: // a, for left
-        //joint.out.position.x -= 0.01;
-        eye.position.x -= 0.05;
+        // console.log(eye);
+        angle = (angle + 0.1) % (2 * Math.PI);
+        var newLocation = computePosition(eye, angle);
+        eye.looking.x = newLocation[0];
+        eye.looking.y = newLocation[1];
         break;
       case 100: // d, for right
-        //joint.out.position.x += 0.01;
-        eye.position.x += 0.05;
+        angle = (angle - 0.1) % (2 * Math.PI);
+        var newLocation = computePosition(eye, angle);
+        eye.looking.x = newLocation[0];
+        eye.looking.y = newLocation[1];
         break;
       case 115: // s, for down
-        //joint.out.position.y -= 0.01;
-        eye.position.z -= 0.05;
+        eye.looking.z -= 0.5;
         break;
-      case 105: // i, for camera up
-        eye.looking.z += 0.01;
+      case 106: //j, for moving forward
+        var movementVector = computeMovement(eye, 2);
+        eye.position.x += movementVector.x;
+        eye.position.y += movementVector.y;
+        eye.position.z += movementVector.z;
         break;
-      case 106: //j, for camera left
-        eye.looking.x -= 0.01;
-        break;
-      case 107: // k, for camera down
-        eye.looking.z -= 0.01;
-        break;
-      case 108: // l, for camera right
-        eye.looking.x += 0.01;
+      case 107: // k, for moving backward
+        var movementVector = computeMovement(eye, 2);
+        eye.position.x -= movementVector.x;
+        eye.position.y -= movementVector.y;
+        eye.position.z -= movementVector.z;
         break;
       default:
         console.log(event.keyCode);
@@ -256,28 +306,11 @@ function updateShapes(shapes) {
     var morningStar = shapes[0];
     var joint = shapes[1];
 
-    //morningStar.slider.rotation.x += 4;
-    //morningStar.slider.rotation.y += 0.1;
-    //morningStar.handle.rotation.x -= SPIN_CONSTANT;
-    //morningStar.ball.rotation.x -= 2;
-
-    if (swingLeft) {
-      //morningStar.handle.rotation.z -= SPIN_CONSTANT;
-      //morningStar.slider.scale.x += 0.008;
-      //morningStar.chain.rotation.z -= SPIN_CONSTANT + 0.3;
-      //swingLeft = morningStar.handle.rotation.z > -40;
-    } else {
-      //morningStar.slider.scale.x -= 0.008;
-      //morningStar.handle.rotation.z += SPIN_CONSTANT;
-      //morningStar.chain.rotation.z += SPIN_CONSTANT + 0.3;
-      //swingLeft = morningStar.handle.rotation.z > 40;
-    }
-
     joint.out.rotation.z -= 1;
     joint.out.rotation.y -= 1;
     joint.bend.rotation.y -= 1;
     joint.bend2.rotation.x -= 1;
+    joint.bend3.rotation.x -= 1;
     joint.end.rotation.x -= 3;
   }
 }
-

@@ -3,6 +3,7 @@ function Coordinate(x, y, z) {
   this.y = y;
   this.z = z;
 }
+
 function Rotation(x, y, z, xy, xz, yz) {
   Coordinate.apply(this, arguments);
   this.xy = xy;
@@ -17,7 +18,7 @@ function Eye(position, looking, up) {
 }
 
 function Axes() {
-  this.start = 192;
+  this.start = 210;
   this.size = 6;
 }
 
@@ -32,7 +33,7 @@ Axes.prototype.draw = function(gl, modelMatrix, viewMatrix, projMatrix, normalMa
 };
 
 function GroundGrid() {
-  this.start = 198;
+  this.start = 216;
   this.size = 400;
 }
 
@@ -42,6 +43,62 @@ GroundGrid.prototype.draw = function(gl, modelMatrix, viewMatrix, projMatrix, no
   normalMatrix.transpose();
   injectMvpMatrix(gl, modelMatrix, viewMatrix, projMatrix, normalMatrix, u_MvpMatrix, u_NormalMatrix);
   gl.drawArrays(gl.LINES, this.start, this.size);
+};
+
+function Cube(position, scale, rotation) {
+  this.cube = new Rectangle(position,
+    new Coordinate(scale, scale, scale), rotation, new Coordinate(0, 0, 0));
+}
+
+Cube.prototype.draw = function(gl, modelMatrix, viewMatrix, projMatrix, normalMatrix, u_MvpMatrix, u_NormalMatrix) {
+  modelMatrix.setTranslate(0, 0, 0);
+  drawRectangle(gl, modelMatrix, viewMatrix, projMatrix, normalMatrix, u_MvpMatrix, u_NormalMatrix,
+    new Coordinate(this.cube.position.x, this.cube.position.y, this.cube.position.z),
+    new Coordinate(this.cube.scale.x, this.cube.scale.y, this.cube.scale.z),
+    new Rotation(this.cube.rotation.x, this.cube.rotation.y, this.cube.rotation.z,
+      this.cube.rotation.xy, this.cube.rotation.xz, this.cube.rotation.yz),
+    new Coordinate(this.cube.origin.x, this.cube.origin.y, this.cube.origin.z));
+};
+
+function Pyramid(position, scale, rotation) {
+  this.pyramid = new Rectangle(position,
+    new Coordinate(scale, scale, scale), rotation, new Coordinate(0, 0, 0));
+}
+
+Pyramid.prototype.draw = function(gl, modelMatrix, viewMatrix, projMatrix, normalMatrix, u_MvpMatrix, u_NormalMatrix) {
+  modelMatrix.setTranslate(0, 0, 0);
+  drawPyramid(gl, modelMatrix, viewMatrix, projMatrix, normalMatrix, u_MvpMatrix, u_NormalMatrix,
+    new Coordinate(this.pyramid.position.x, this.pyramid.position.y, this.pyramid.position.z),
+    new Coordinate(this.pyramid.scale.x, this.pyramid.scale.y, this.pyramid.scale.z),
+    new Rotation(this.pyramid.rotation.x, this.pyramid.rotation.y, this.pyramid.rotation.z,
+      this.pyramid.rotation.xy, this.pyramid.rotation.xz, this.pyramid.rotation.yz),
+    new Coordinate(this.pyramid.origin.x, this.pyramid.origin.y, this.pyramid.origin.z));
+};
+
+function House(position, scale, rotation) {
+  this.base = new Rectangle(position,
+    new Coordinate(scale, scale, scale), rotation, new Coordinate(0, 0, 0));
+  this.roof = new Rectangle(
+    new Coordinate(0, 0, scale * 0.9),
+    new Coordinate(scale * 1.3, scale * 1.3, scale * 1.3),
+    rotation, new Coordinate(0, 0, 0));
+}
+
+House.prototype.draw = function(gl, modelMatrix, viewMatrix, projMatrix, normalMatrix, u_MvpMatrix, u_NormalMatrix) {
+  modelMatrix.setTranslate(0, 0, 0);
+  drawRectangle(gl, modelMatrix, viewMatrix, projMatrix, normalMatrix, u_MvpMatrix, u_NormalMatrix,
+    new Coordinate(this.base.position.x, this.base.position.y, this.base.position.z),
+    new Coordinate(this.base.scale.x, this.base.scale.y, this.base.scale.z),
+    new Rotation(this.base.rotation.x, this.base.rotation.y, this.base.rotation.z,
+      this.base.rotation.xy, this.base.rotation.xz, this.base.rotation.yz),
+    new Coordinate(this.base.origin.x, this.base.origin.y, this.base.origin.z));
+  undoScale(this.base, modelMatrix);
+  drawPyramid(gl, modelMatrix, viewMatrix, projMatrix, normalMatrix, u_MvpMatrix, u_NormalMatrix,
+    new Coordinate(this.roof.position.x, this.roof.position.y, this.roof.position.z),
+    new Coordinate(this.roof.scale.x, this.roof.scale.y, this.roof.scale.z),
+    new Rotation(this.roof.rotation.x, this.roof.rotation.y, this.roof.rotation.z,
+      this.roof.rotation.xy, this.roof.rotation.xz, this.roof.rotation.yz),
+    new Coordinate(this.roof.origin.x, this.roof.origin.y, this.roof.origin.z));
 };
 
 // @params Cordinate, Scalar, Coordinate
@@ -105,17 +162,6 @@ MorningStar.prototype.draw = function(gl, modelMatrix, viewMatrix, projMatrix, n
     new Rotation(this.ball.rotation.x, this.ball.rotation.y, this.ball.rotation.z,
       this.ball.rotation.xy, this.ball.rotation.xz, this.ball.rotation.yz),
     new Coordinate(this.ball.origin.x, this.ball.origin.y, this.ball.origin.z));
-
-  undoScale(this.ball, modelMatrix);
-  var tempModel = new Matrix4();
-  normalMatrix.setInverseOf(tempModel);
-  normalMatrix.transpose();
-  drawAxes(gl, modelMatrix, viewMatrix, projMatrix, normalMatrix, u_MvpMatrix, u_NormalMatrix,
-    new Coordinate(0, 0, 0),
-    new Coordinate(1, 1, 1),
-    new Rotation(this.ball.rotation.x, this.ball.rotation.y, this.ball.rotation.z,
-      this.ball.rotation.xy, this.ball.rotation.xz, this.ball.rotation.yz),
-    new Coordinate(this.ball.origin.x, this.ball.origin.y, this.ball.origin.z));
 };
 
 function Joint(position, scale, rotation) {
@@ -143,6 +189,16 @@ function Joint(position, scale, rotation) {
     new Coordinate(0, scale / 1.25, 0),
     new Coordinate(scale / 5, scale, scale / 5),
     new Rotation(rotation.x, rotation.y, rotation.z + 270, rotation.xy, rotation.xz, rotation.yz),
+    new Coordinate(0, scale / 1.25, 0));
+  this.join3 = new Rectangle(
+    new Coordinate(0, scale * 1.5, 0),
+    new Coordinate(scale / 2, scale / 2, scale / 2),
+    new Rotation(rotation.x, rotation.y, rotation.z, rotation.xy, rotation.xz, rotation.yz),
+    new Coordinate(0, 0, 0));
+  this.bend3 = new Rectangle(
+    new Coordinate(0, scale / 1.25, 0),
+    new Coordinate(scale / 5, scale, scale / 5),
+    new Rotation(rotation.x, rotation.y, rotation.z + 90, rotation.xy, rotation.xz, rotation.yz),
     new Coordinate(0, scale / 1.25, 0));
   this.end = new MultiPyramid(
     new Coordinate(0, scale * 1.5, 0),
@@ -194,9 +250,33 @@ Joint.prototype.draw = function(gl, modelMatrix, viewMatrix, projMatrix, normalM
     new Coordinate(this.bend2.origin.x, this.bend2.origin.y, this.bend2.origin.z));
 
   undoScale(this.bend2, modelMatrix);
+  drawRectangle(gl, modelMatrix, viewMatrix, projMatrix, normalMatrix, u_MvpMatrix, u_NormalMatrix,
+    new Coordinate(this.join3.position.x, this.join3.position.y, this.join3.position.z),
+    new Coordinate(this.join3.scale.x, this.join3.scale.y, this.join3.scale.z),
+    new Rotation(this.join3.rotation.x, this.join3.rotation.y, this.join3.rotation.z,
+      this.join3.rotation.xy, this.join3.rotation.xz, this.join3.rotation.yz),
+    new Coordinate(this.join3.origin.x, this.join3.origin.y, this.join3.origin.z));
+
+  undoScale(this.join3, modelMatrix);
+  drawRectangle(gl, modelMatrix, viewMatrix, projMatrix, normalMatrix, u_MvpMatrix, u_NormalMatrix,
+    new Coordinate(this.bend3.position.x, this.bend3.position.y, this.bend3.position.z),
+    new Coordinate(this.bend3.scale.x, this.bend3.scale.y, this.bend3.scale.z),
+    new Rotation(this.bend3.rotation.x, this.bend3.rotation.y, this.bend3.rotation.z,
+      this.bend3.rotation.xy, this.bend3.rotation.xz, this.bend3.rotation.yz),
+    new Coordinate(this.bend3.origin.x, this.bend3.origin.y, this.bend3.origin.z));
+
+  undoScale(this.bend3, modelMatrix);
   drawMultiPyramid(gl, modelMatrix, viewMatrix, projMatrix, normalMatrix, u_MvpMatrix, u_NormalMatrix,
     new Coordinate(this.end.position.x, this.end.position.y, this.end.position.z),
     new Coordinate(this.end.scale.x, this.end.scale.y, this.end.scale.z),
+    new Rotation(this.end.rotation.x, this.end.rotation.y, this.end.rotation.z,
+      this.end.rotation.xy, this.end.rotation.xz, this.end.rotation.yz),
+    new Coordinate(this.end.origin.x, this.end.origin.y, this.end.origin.z));
+
+  undoScale(this.end, modelMatrix);
+  drawAxes(gl, modelMatrix, viewMatrix, projMatrix, normalMatrix, u_MvpMatrix, u_NormalMatrix,
+    new Coordinate(0, 0, 0),
+    new Coordinate(1, 1, 1),
     new Rotation(this.end.rotation.x, this.end.rotation.y, this.end.rotation.z,
       this.end.rotation.xy, this.end.rotation.xz, this.end.rotation.yz),
     new Coordinate(this.end.origin.x, this.end.origin.y, this.end.origin.z));
@@ -264,10 +344,15 @@ function drawMultiPyramid(gl, modelMatrix, viewMatrix, projMatrix, normalMatrix,
   drawThing(gl, modelMatrix, viewMatrix, projMatrix, normalMatrix, u_MvpMatrix, u_NormalMatrix, 96, 96);
 }
 
+function drawPyramid(gl, modelMatrix, viewMatrix, projMatrix, normalMatrix, u_MvpMatrix, u_NormalMatrix, location, scale, rotation, origin) {
+  updateMatrices(modelMatrix, viewMatrix, projMatrix, normalMatrix, scale, rotation, origin, location);
+  drawThing(gl, modelMatrix, viewMatrix, projMatrix, normalMatrix, u_MvpMatrix, u_NormalMatrix, 192, 18);
+}
+
 function drawAxes(gl, modelMatrix, viewMatrix, projMatrix, normalMatrix, u_MvpMatrix, u_NormalMatrix, location, scale, rotation, origin) {
   updateMatrices(modelMatrix, viewMatrix, projMatrix, normalMatrix, scale, rotation, origin, location);
   injectMvpMatrix(gl, modelMatrix, viewMatrix, projMatrix, normalMatrix, u_MvpMatrix, u_NormalMatrix);
-  gl.drawArrays(gl.LINES, 192, 6);
+  gl.drawArrays(gl.LINES, 210, 6);
 }
 
 function updateMatrices(modelMatrix, viewMatrix, projMatrix, normalMatrix, scale, rotation, origin, location) {
