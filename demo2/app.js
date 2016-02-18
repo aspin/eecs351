@@ -72,40 +72,44 @@ function main() {
 }
 
 function loadShaders(callback) {
-   var vShaderSrc = new XMLHttpRequest(),
-       fShaderSrc = new XMLHttpRequest();
-
-   var oneCompleted = false;
-   var sources = {};
-   var initialize = function(shaderName, shaderSource) {
-     sources[shaderName] = shaderSource;
-     if (oneCompleted) {
-       callback(sources);
-     } else {
-       oneCompleted = true;
-     }
-   };
-
-   vShaderSrc.open('GET', '/shaders/vshader.esgl');
-   fShaderSrc.open('GET', '/shaders/fshader.esgl');
-   vShaderSrc.onreadystatechange = function() {
-     if (vShaderSrc.readyState === 4 && vShaderSrc.status === 200) {
-       initialize(VSHADER, vShaderSrc.responseText);
-     }
-   };
-   fShaderSrc.onreadystatechange = function() {
-     if (fShaderSrc.readyState === 4 && fShaderSrc.status === 200) {
-       initialize(FSHADER, fShaderSrc.responseText);
-     }
-   };
-   vShaderSrc.send();
-   fShaderSrc.send();
+  //  var vShaderSrc = new XMLHttpRequest(),
+  //      fShaderSrc = new XMLHttpRequest();
+   //
+  //  var oneCompleted = false;
+  //  var sources = {};
+  //  var initialize = function(shaderName, shaderSource) {
+  //    sources[shaderName] = shaderSource;
+  //    if (oneCompleted) {
+  //      callback(sources);
+  //    } else {
+  //      oneCompleted = true;
+  //    }
+  //  };
+   //
+  //  vShaderSrc.open('GET', '/shaders/vshader.esgl');
+  //  fShaderSrc.open('GET', '/shaders/fshader.esgl');
+  //  vShaderSrc.onreadystatechange = function() {
+  //    if (vShaderSrc.readyState === 4 && vShaderSrc.status === 200) {
+  //      initialize(VSHADER, vShaderSrc.responseText);
+  //    }
+  //  };
+  //  fShaderSrc.onreadystatechange = function() {
+  //    if (fShaderSrc.readyState === 4 && fShaderSrc.status === 200) {
+  //      initialize(FSHADER, fShaderSrc.responseText);
+  //    }
+  //  };
+  //  vShaderSrc.send();
+  //  fShaderSrc.send();
 
   // FOR HTML OPEN:
-  //var sources = {};
-  //sources[FSHADER] = 'precisionV mediump float;\nvarying vec4 v_Color;\nvoid main() {\ngl_FragColor = v_Color;\n}\n';
-  //sources[VSHADER] = 'attribute vec4 a_Position;\nuniform mat4 u_ModelMatrix;\nattribute vec4 a_Color;\nvarying vec4 v_Color;\nvoid main() {\ngl_Position = u_ModelMatrix * a_Position;\ngl_PointSize = 10.0;\nv_Color = a_Color;\n}\n ';
-  //callback(sources);
+  var sources = {};
+  sources[FSHADER] = 'precision mediump float;\nvarying vec4 v_Color;\nvoid main() {\ngl_FragColor = v_Color;\n}\n';
+  sources[VSHADER] = 'attribute vec4 a_Position;attribute vec4 a_Normal;attribute vec4 a_Color;' +
+                     'uniform mat4 u_MvpMatrix;uniform mat4 u_NormalMatrix;uniform vec3 u_LightDirection;' +
+                     'varying vec4 v_Color;void main() {gl_Position = u_MvpMatrix*a_Position;gl_PointSize = 10.0;' +
+                     'vec4 normal=u_NormalMatrix*a_Normal;float nDotL=clamp(dot(normalize(normal.xyz), normalize(u_LightDirection)), 0.0, 1.0);' +
+                     'v_Color = vec4(a_Color.xyz * (0.3 + 0.7 * nDotL), a_Color.a);}';
+  callback(sources);
 }
 
 function initWebGL(canvas, sources) {
