@@ -21,10 +21,6 @@ Drawer.prototype.addColor = function(id, r, g, b) {
   this.colors[id] = [r, g, b];
 };
 
-Drawer.prototype.computeNormal = function(triangleSet) {
-  return this.normals[triangleSet] || [0.0, 0.0, 1.0];
-};
-
 Drawer.prototype.getRandomColors = function(count) {
   var colors = [];
   for(var i = 0; i < count; i++) {

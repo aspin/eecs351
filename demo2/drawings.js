@@ -1,5 +1,6 @@
 function getVertices() {
   var drawUtil = new Drawer();
+  var i;
   drawUtil.addVertex('ftl', -1.0, 1.0, 1.0);
   drawUtil.addVertex('ftr', 1.0, 1.0, 1.0);
   drawUtil.addVertex('fbl', -1.0, -1.0, 1.0);
@@ -74,7 +75,7 @@ function getVertices() {
   drawUtil.addTriangle('if19', 'i9', 'i8', 'i1');
 
   var icosaTriangles = [];
-  for(var i = 0; i < 20; i++) {
+  for(i = 0; i < 20; i++) {
     icosaTriangles.push('if' + i);
   }
 
@@ -107,6 +108,9 @@ function getVertices() {
   drawUtil.addTriangle('sf5', 'o', '+sy', 's-x+y');
   drawUtil.addTriangle('sf6', 'o', '-sy', 's+x-y');
   drawUtil.addTriangle('sf7', 'o', '-sy', 's-x-y');
+  for (i = 0; i < 8; i++) {
+    drawUtil.addNormal('sf' + i, 0.0, 0.0, 1.0);
+  }
   drawUtil.addTriangle('sb0', 'ob', '+sbx', 'sb+x+y');
   drawUtil.addTriangle('sb1', 'ob', '+sbx', 'sb+x-y');
   drawUtil.addTriangle('sb2', 'ob', '-sbx', 'sb-x+y');
@@ -115,22 +119,41 @@ function getVertices() {
   drawUtil.addTriangle('sb5', 'ob', '+sby', 'sb-x+y');
   drawUtil.addTriangle('sb6', 'ob', '-sby', 'sb+x-y');
   drawUtil.addTriangle('sb7', 'ob', '-sby', 'sb-x-y');
+  for (i = 0; i < 8; i++) {
+    drawUtil.addNormal('sb' + i, 0.0, 0.0, -1.0);
+  }
   drawUtil.addTriangle('se0', '+sx', 's+x+y', 'sb+x+y');
+  drawUtil.addNormal('se0', 0.394, 0.919, 0.0);
   drawUtil.addTriangle('se1', '+sx', '+sbx', 'sb+x+y');
+  drawUtil.addNormal('se1', 0.394, 0.919, 0.0);
   drawUtil.addTriangle('se2', '+sy', 's+x+y', 'sb+x+y');
+  drawUtil.addNormal('se2', 0.919, 0.394, 0.0);
   drawUtil.addTriangle('se3', '+sy', '+sby', 'sb+x+y');
+  drawUtil.addNormal('se3', 0.919, 0.394, 0.0);
   drawUtil.addTriangle('se4', '+sy', 's-x+y', 'sb-x+y');
+  drawUtil.addNormal('se4', -0.919, 0.394, 0.0);
   drawUtil.addTriangle('se5', '+sy', '+sby', 'sb-x+y');
+  drawUtil.addNormal('se5', -0.919, 0.394, 0.0);
   drawUtil.addTriangle('se6', '-sx', 's-x+y', 'sb-x+y');
+  drawUtil.addNormal('se6', -0.394, 0.919, 0.0);
   drawUtil.addTriangle('se7', '-sx', '-sbx', 'sb-x+y');
+  drawUtil.addNormal('se7', -0.394, 0.919, 0.0);
   drawUtil.addTriangle('se8', '-sx', 's-x-y', 'sb-x-y');
+  drawUtil.addNormal('se8', -0.394, -0.919, 0.0);
   drawUtil.addTriangle('se9', '-sx', '-sbx', 'sb-x-y');
+  drawUtil.addNormal('se9', -0.394, -0.919, 0.0);
   drawUtil.addTriangle('se10', '-sy', 's-x-y', 'sb-x-y');
+  drawUtil.addNormal('se10', -0.919, -0.394, 0.0);
   drawUtil.addTriangle('se11', '-sy', '-sby', 'sb-x-y');
+  drawUtil.addNormal('se11', -0.919, -0.394, 0.0);
   drawUtil.addTriangle('se12', '-sy', 's+x-y', 'sb+x-y');
+  drawUtil.addNormal('se12', -0.919, 0.394, 0.0);
   drawUtil.addTriangle('se13', '-sy', '-sby', 'sb+x-y');
+  drawUtil.addNormal('se13', -0.919, 0.394, 0.0);
   drawUtil.addTriangle('se14', '+sx', 's+x-y', 'sb+x-y');
+  drawUtil.addNormal('se14', 0.394, -0.919, 0.0);
   drawUtil.addTriangle('se15', '+sx', '+sbx', 'sb+x-y');
+  drawUtil.addNormal('se15', 0.394, -0.919, 0.0);
 
   var starTriangles = [];
   for(i = 0; i < 8; i++) {
@@ -146,8 +169,7 @@ function getVertices() {
   var triangles = rectangleTris.concat(icosaTriangles).concat(starTriangles);
   var trianglesArray = drawUtil.exportTriangles(triangles);
   
-  var i,
-      vertex,
+  var vertex,
       min = -50,
       max = 50;
   var groundVertices = new Float32Array(9 * 2 * 2 * 100); // 100 lines, x and y direction

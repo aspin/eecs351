@@ -256,7 +256,7 @@ function updateShapes(shapes) {
     var morningStar = shapes[0];
     var joint = shapes[1];
 
-    morningStar.slider.rotation.x += 4;
+    //morningStar.slider.rotation.x += 4;
     //morningStar.slider.rotation.y += 0.1;
     //morningStar.handle.rotation.x -= SPIN_CONSTANT;
     //morningStar.ball.rotation.x -= 2;
@@ -273,11 +273,11 @@ function updateShapes(shapes) {
       //swingLeft = morningStar.handle.rotation.z > 40;
     }
 
-    //joint.out.rotation.z -= 1;
-    //joint.out.rotation.y -= 1;
-    //joint.bend.rotation.y -= 1;
-    //joint.bend2.rotation.x -= 1;
-    //joint.end.rotation.x -= 3;
+    joint.out.rotation.z -= 1;
+    joint.out.rotation.y -= 1;
+    joint.bend.rotation.y -= 1;
+    joint.bend2.rotation.x -= 1;
+    joint.end.rotation.x -= 3;
   }
 }
 
