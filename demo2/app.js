@@ -117,7 +117,7 @@ function initWebGL(canvas, sources) {
 }
 
 function bindVariables(gl, vertices) {
-  vertexBuffer = gl.createBuffer();
+  var vertexBuffer = gl.createBuffer();
   if (!vertexBuffer) {
     throw 'Failed to create buffer';
   }
@@ -256,28 +256,28 @@ function updateShapes(shapes) {
     var morningStar = shapes[0];
     var joint = shapes[1];
 
-    //morningStar.slider.rotation.x += 4;
+    morningStar.slider.rotation.x += 4;
     //morningStar.slider.rotation.y += 0.1;
     //morningStar.handle.rotation.x -= SPIN_CONSTANT;
-    morningStar.ball.rotation.x -= 2;
+    //morningStar.ball.rotation.x -= 2;
 
     if (swingLeft) {
-      morningStar.handle.rotation.z -= SPIN_CONSTANT;
-      morningStar.slider.scale.x += 0.008;
-      morningStar.chain.rotation.z -= SPIN_CONSTANT + 0.3;
-      swingLeft = morningStar.handle.rotation.z > -40;
+      //morningStar.handle.rotation.z -= SPIN_CONSTANT;
+      //morningStar.slider.scale.x += 0.008;
+      //morningStar.chain.rotation.z -= SPIN_CONSTANT + 0.3;
+      //swingLeft = morningStar.handle.rotation.z > -40;
     } else {
-      morningStar.slider.scale.x -= 0.008;
-      morningStar.handle.rotation.z += SPIN_CONSTANT;
-      morningStar.chain.rotation.z += SPIN_CONSTANT + 0.3;
-      swingLeft = morningStar.handle.rotation.z > 40;
+      //morningStar.slider.scale.x -= 0.008;
+      //morningStar.handle.rotation.z += SPIN_CONSTANT;
+      //morningStar.chain.rotation.z += SPIN_CONSTANT + 0.3;
+      //swingLeft = morningStar.handle.rotation.z > 40;
     }
 
     //joint.out.rotation.z -= 1;
     //joint.out.rotation.y -= 1;
     //joint.bend.rotation.y -= 1;
     //joint.bend2.rotation.x -= 1;
-    joint.end.rotation.x -= 3;
+    //joint.end.rotation.x -= 3;
   }
 }
 

@@ -22,6 +22,19 @@ function getVertices() {
   drawUtil.addTriangle('-z1', 'btl', 'btr', 'bbr');
   drawUtil.addTriangle('-z2', 'btl', 'bbl', 'bbr');
 
+  drawUtil.addNormal('+x1', 1.0, 0.0, 0.0);
+  drawUtil.addNormal('+x2', 1.0, 0.0, 0.0);
+  drawUtil.addNormal('+y1', 0.0, 1.0, 0.0);
+  drawUtil.addNormal('+y2', 0.0, 1.0, 0.0);
+  drawUtil.addNormal('+z1', 0.0, 0.0, 1.0);
+  drawUtil.addNormal('+z2', 0.0, 0.0, 1.0);
+  drawUtil.addNormal('-x1', -1.0, 0.0, 0.0);
+  drawUtil.addNormal('-x2', -1.0, 0.0, 0.0);
+  drawUtil.addNormal('-y1', 0.0, -1.0, 0.0);
+  drawUtil.addNormal('-y2', 0.0, -1.0, 0.0);
+  drawUtil.addNormal('-z1', 0.0, 0.0, -1.0);
+  drawUtil.addNormal('-z2', 0.0, 0.0, -1.0);
+
   var rectangleTris = ['+x1', '+x2', '+y1', '+y2', '+z1', '+z2',
     '-x1', '-x2', '-y1', '-y2', '-z1', '-z2'];
   // Creating an icosahedron + 1 vertex

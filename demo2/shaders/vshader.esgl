@@ -14,5 +14,5 @@ void main() {
 
   vec4 normal = u_NormalMatrix * a_Normal;
   float nDotL = clamp(dot(normalize(normal.xyz), normalize(u_LightDirection)), 0.0, 1.0);
-  v_Color = vec4(a_Color.xyz * nDotL, a_Color.a);
+  v_Color = vec4(a_Color.xyz * (0.3 + 0.7 * nDotL), a_Color.a);
 }

@@ -23,8 +23,6 @@ function Axes() {
 
 Axes.prototype.draw = function(gl, modelMatrix, viewMatrix, projMatrix, normalMatrix, u_MvpMatrix, u_NormalMatrix) {
   modelMatrix.setTranslate(0, 0, 0);
-  normalMatrix.setInverseOf(modelMatrix);
-  normalMatrix.transpose();
   drawAxes(gl, modelMatrix, viewMatrix, projMatrix, normalMatrix, u_MvpMatrix, u_NormalMatrix,
     new Coordinate(0, 0, 0.1),
     new Coordinate(4, 4, 4),
@@ -109,6 +107,9 @@ MorningStar.prototype.draw = function(gl, modelMatrix, viewMatrix, projMatrix, n
     new Coordinate(this.ball.origin.x, this.ball.origin.y, this.ball.origin.z));
 
   undoScale(this.ball, modelMatrix);
+  var tempModel = new Matrix4();
+  normalMatrix.setInverseOf(tempModel);
+  normalMatrix.transpose();
   drawAxes(gl, modelMatrix, viewMatrix, projMatrix, normalMatrix, u_MvpMatrix, u_NormalMatrix,
     new Coordinate(0, 0, 0),
     new Coordinate(1, 1, 1),
@@ -152,7 +153,6 @@ function Joint(position, scale, rotation) {
 
 Joint.prototype.draw = function(gl, modelMatrix, viewMatrix, projMatrix, normalMatrix, u_MvpMatrix, u_NormalMatrix) {
   modelMatrix.setTranslate(0, 0, 0);
-
 
   drawRectangle(gl, modelMatrix, viewMatrix, projMatrix, normalMatrix, u_MvpMatrix, u_NormalMatrix,
     new Coordinate(this.out.position.x, this.out.position.y, this.out.position.z),
@@ -203,7 +203,7 @@ Joint.prototype.draw = function(gl, modelMatrix, viewMatrix, projMatrix, normalM
 };
 
 function undoScale(property, modelMatrix) {
- modelMatrix.scale(1 / property.scale.x, 1 / property.scale.y, 1 / property.scale.z);
+  modelMatrix.scale(1 / property.scale.x, 1 / property.scale.y, 1 / property.scale.z);
 }
 
 function Rectangle(position, scale, rotation, origin) {
@@ -233,7 +233,12 @@ function injectMvpMatrix(gl, modelMatrix, viewMatrix, projMatrix, normalMatrix, 
   tempProjMatrix.elements = new Float32Array(projMatrix.elements.slice(0));
   var tempViewMatrix = new Matrix4();
   tempViewMatrix.elements = new Float32Array(viewMatrix.elements.slice(0));
-  var mvpMatrix = tempProjMatrix.multiply(tempViewMatrix.multiply(modelMatrix));
+  tempViewMatrix.multiply(modelMatrix);
+  normalMatrix.setInverseOf(modelMatrix);
+  normalMatrix.transpose();
+
+  var mvpMatrix = tempProjMatrix.multiply(tempViewMatrix);
+
   gl.uniformMatrix4fv(u_MvpMatrix, false, mvpMatrix.elements);
   gl.uniformMatrix4fv(u_NormalMatrix, false, normalMatrix.elements);
 }
@@ -266,7 +271,6 @@ function drawAxes(gl, modelMatrix, viewMatrix, projMatrix, normalMatrix, u_MvpMa
 }
 
 function updateMatrices(modelMatrix, viewMatrix, projMatrix, normalMatrix, scale, rotation, origin, location) {
-  //modelMatrix.scale(1, 1, -1);
   modelMatrix.translate(location.x, location.y, location.z);
   modelMatrix.translate(-origin.x, -origin.y, -origin.z);
   modelMatrix.rotate(rotation.x, 0, 1, 0);
@@ -277,7 +281,4 @@ function updateMatrices(modelMatrix, viewMatrix, projMatrix, normalMatrix, scale
   modelMatrix.rotate(rotation.xz, 1, 0, 1);
   modelMatrix.translate(origin.x, origin.y, origin.z);
   modelMatrix.scale(scale.x, scale.y, scale.z);
-
-  normalMatrix.setInverseOf(modelMatrix);
-  normalMatrix.transpose();
 }
