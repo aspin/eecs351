@@ -51,7 +51,7 @@ function main() {
 
     var eye = new Eye(
       new Coordinate(3.0, 2.0, 1.5),
-      new Coordinate(0.0, 0.0, 1.5),
+      new Coordinate(0.0, 0.0, 0.0),
       new Coordinate(0.0, 0.0, 1.0)
     );
 
@@ -60,9 +60,8 @@ function main() {
 
     var animate = function() {
       // Autostretch
-      canvas.height = window.innerHeight;
+      canvas.height = window.innerHeight - 90;
       canvas.width = window.innerWidth;
-      //gl.viewport(0, 0, canvas.width, canvas.height);
 
       updateShapes(shapes);
       draw(gl, canvas, modelMatrix, viewMatrix, projMatrix, normalMatrix, u_MvpMatrix, u_NormalMatrix, shapes, eye);
@@ -206,11 +205,11 @@ function setupMouseHandlers(gl, canvas, shapes) {
 
 
 var angle = 0;
-var offset = 5.4 * Math.PI / 4;
+var offset = Math.atan(2/3);
 function computePosition(eye, angle) {
   var distance = computeEyeDistance(eye);
-  var position = [ eye.position.x + distance * Math.cos(angle + offset),
-                   eye.position.y + distance * Math.sin(angle + offset)];
+  var position = [ eye.position.x - distance * Math.cos(angle + offset),
+                   eye.position.y - distance * Math.sin(angle + offset)];
   return position;
 };
 
@@ -243,32 +242,33 @@ function setupKeyboardHandlers(gl, canvas, shapes, eye) {
   window.onkeypress = function (event) {
     switch (event.keyCode) {
       case 119: // w, for up
-        eye.looking.z += 0.5;
+        eye.looking.z += 0.08;
         break;
       case 97: // a, for left
-        // console.log(eye);
-        angle = (angle + 0.1) % (2 * Math.PI);
+        angle = (angle + 0.05) % (2 * Math.PI);
+        console.log(angle);
         var newLocation = computePosition(eye, angle);
         eye.looking.x = newLocation[0];
         eye.looking.y = newLocation[1];
         break;
       case 100: // d, for right
-        angle = (angle - 0.1) % (2 * Math.PI);
+        angle = (angle - 0.05) % (2 * Math.PI);
+        console.log(angle);
         var newLocation = computePosition(eye, angle);
         eye.looking.x = newLocation[0];
         eye.looking.y = newLocation[1];
         break;
       case 115: // s, for down
-        eye.looking.z -= 0.5;
+        eye.looking.z -= 0.08;
         break;
       case 106: //j, for moving forward
-        var movementVector = computeMovement(eye, 2);
+        var movementVector = computeMovement(eye, 0.5);
         eye.position.x += movementVector.x;
         eye.position.y += movementVector.y;
         eye.position.z += movementVector.z;
         break;
       case 107: // k, for moving backward
-        var movementVector = computeMovement(eye, 2);
+        var movementVector = computeMovement(eye, 0.5);
         eye.position.x -= movementVector.x;
         eye.position.y -= movementVector.y;
         eye.position.z -= movementVector.z;
