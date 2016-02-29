@@ -711,7 +711,7 @@ function myKeyPress(ev) {
 			draw();														// re-draw on-screen image.
 			break;
 		case 115:	// LOWER-case 's' key:
-      lamp0.increaseShiny();
+      lamp0.decreaseShiny();
 			draw();													// re-draw on-screen image.
 			break;
 		default:
