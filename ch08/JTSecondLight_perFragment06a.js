@@ -41,22 +41,48 @@
 //								ALSO -- change lamp0 position to better-looking (6,5,5). 
 //								(don't forget HTML button handler 'clearDrag()' fcn below).
 //				PUZZLE:  What limits specular highlight to 45deg from world +x axis? 
-
+//								 How could you fix that?
+//	Version 06: create GLSL struct & prove it works in Vertex Shader; then
+//							make a 'LampT' struct uniform.	
+															
+//  Fri Feb 26 2016 in-class activity:
+//	Version 06: Step 1 to remove Global variables by object-oriented design;
+//							LET US TRY IT!   Organize collections of objects: 
+//							--Best way to create a JavaScript 'Lamp' object?
+//							--Best way to transfer contents to GLSL? GLSL 'Lamp' struct?
+// (try: https://www.opengl.org/wiki/Uniform_%28GLSL%29 
+//							--find 'struct Thingy', note how uniforms set struct contents
+//								in sequential locations, and/or fill them as arrays...
+// (try: http://wiki.lwjgl.org/wiki/GLSL_Tutorial:_Communicating_with_Shaders)
+//
 //	STILL TO DO:
+//							--add direction/spotlight mode (Lengyel, Section 7.2.4 pg. 160)
+//							by adding a 'look-at' point member.
+//							--add a user-interface to aim the spotlight ('glass cylinder'?) 
+//							--add a new light that recreates the Version 01 light at (6,6,0).
+//							--add user-interface to (fixed) light at (6,6,0).  How shall we 
+//							organize MULTIPLE lights (up to 8?) by object-oriented methods?
+
 //			--Re-organize for selectable Phong Materials (see 'materials_Ayerdi.js')
-//			--Re-organize for selectable Lamp objects (how would you do that?)
-//			--Re-organize to eliminate all these global vars!!
+//			--Further object-oriented re-organizing: can we make objects for 
+//				User-Interface? Shapes? Textures? Camera? Animation? can we fit them 
+//				inside a Scene object? etc
 
 //=============================================================================
 // Vertex shader program
 //=============================================================================
 var VSHADER_SOURCE =
+	//-------------Set precision.
+	// GLSL-ES 2.0 defaults (from spec; '4.5.3 Default Precision Qualifiers'):
+	// DEFAULT for Vertex Shaders: 	precision highp float; precision highp int;
+	//									precision lowp sampler2D; precision lowp samplerCube;
+	// DEFAULT for Fragment Shaders:  UNDEFINED for float; precision mediump int;
+	//									precision lowp sampler2D;	precision lowp samplerCube;
+																		
 	//-------------ATTRIBUTES: of each vertex, read from our Vertex Buffer Object
   'attribute vec4 a_Position; \n' +		// vertex position (model coord sys)
   'attribute vec4 a_Normal; \n' +			// vertex normal vector (model coord sys)
-//  'attribute vec4 a_color;\n' + 		// What would 'per-vertex colors' mean in
-										//	in Phong lighting implementation?  disable!
-										// (LATER: replace with attrib. for diffuse reflectance?)
+
 										
 	//-------------UNIFORMS: values set from JavaScript before a drawing command.
  	'uniform vec3 u_Kd; \n' +						//	Instead, we'll use this 'uniform' 
@@ -73,11 +99,24 @@ var VSHADER_SOURCE =
 																				// we use 'uniform' values instead)
   'varying vec4 v_Position; \n' +				
   'varying vec3 v_Normal; \n' +					// Why Vec3? its not a point, hence w==0
-//---------------
+//--------------- GLSL Struct Definition:
+  'uniform int u_Kshiny;\n' +				// Phong Reflectance: 1 < shiny < 128
+  
+	'struct Thingy {\n' +
+	'	vec4 myPos;\n' +
+	' int myInt;\n' +
+	'}; \n' +
+//------------------------END struct definition
+
   'void main() { \n' +
+  '		Thingy myThing;\n' +		// Local var of type 'myThingy'
+  '		myThing.myPos = vec4(a_Position.xyz, 0.0); \n' +
+  '		myThing.myInt = u_Kshiny - 64;\n' +
+//	'		myThing.myInt = 3;\n' +
 		// Compute CVV coordinate values from our given vertex. This 'built-in'
 		// per-vertex value gets interpolated to set screen position for each pixel.
-  '  gl_Position = u_MvpMatrix * a_Position;\n' +
+//  '  gl_Position = u_MvpMatrix * a_Position;\n' +
+  '  gl_Position = u_MvpMatrix * (a_Position + 0.2*myThing.myPos);\n' +
      // Calculate the vertex position & normal vec in the WORLD coordinate system
      // for use as a 'varying' variable: fragment shaders get per-pixel values
      // (interpolated between vertices for our drawing primitive (TRIANGLE)).
@@ -94,9 +133,15 @@ var VSHADER_SOURCE =
 // Fragment shader program
 //=============================================================================
 var FSHADER_SOURCE =
-  '#ifdef GL_ES\n' +
-  'precision mediump float;\n' +
-  '#endif\n' +
+	//-------------Set precision.
+	// GLSL-ES 2.0 defaults (from spec; '4.5.3 Default Precision Qualifiers'):
+	// DEFAULT for Vertex Shaders: 	precision highp float; precision highp int;
+	//									precision lowp sampler2D; precision lowp samplerCube;
+	// DEFAULT for Fragment Shaders:  UNDEFINED for float; precision mediump int;
+	//									precision lowp sampler2D;	precision lowp samplerCube;
+	// MATCH the Vertex shader precision for float and int:
+  'precision highp float;\n' +
+  'precision highp int;\n' +
 	//-------------UNIFORMS: values set from JavaScript before a drawing command.
   // first light source: (YOU write a second one...)
   'uniform vec3 u_Lamp0Pos;\n' + 			// Phong Illum: position
@@ -109,7 +154,7 @@ var FSHADER_SOURCE =
   'uniform vec3 u_Ka;\n' +						// Phong Reflectance: ambient
 	// no Phong Reflectance: diffuse? -- no: use v_Kd instead for per-pixel value
   'uniform vec3 u_Ks;\n' +						// Phong Reflectance: specular
-  'uniform int u_Kshiny;\n' +				// Phong Reflectance: 1 < shiny < 200
+  'uniform int u_Kshiny;\n' +				// Phong Reflectance: 1 < shiny < 128
 //
   'uniform vec3 u_eyePosWorld; \n' + 	// Camera/eye location in world coords.
   
@@ -146,18 +191,7 @@ var FSHADER_SOURCE =
 			// Try it two different ways:		The 'new hotness': pow() fcn in GLSL.
 			// CAREFUL!  pow() won't accept integer exponents! Convert K_shiny!  
 	'  float e64 = pow(nDotH, float(u_Kshiny));\n' +
-/*		
-			// or the 'old-and-busted' method of cascaded multiplies from old hardware
-			// (? "New Hotness" vs. "Old and Busted"? https://youtu.be/ha-uagjJQ9k 
-			//	it's from Men In Black II (2002; fun with early CG special effects) 
-	'  float e02 = nDotH*nDotH; \n' +
-	'  float e04 = e02*e02; \n' +
-	'  float e08 = e04*e04; \n' +
-	'	 float e16 = e08*e08; \n' +
-	'	 float e32 = e16*e16; \n' + 
-	'	 float e64 = e32*e32;	\n' +
-*/
-     	// Calculate the final color from diffuse reflection and ambient reflection
+ 	// Calculate the final color from diffuse reflection and ambient reflection
   '	 vec3 emissive = u_Ke;' +
   '  vec3 ambient = u_Lamp0Amb * u_Ka;\n' +
   '  vec3 diffuse = u_Lamp0Diff * v_Kd * nDotL;\n' +

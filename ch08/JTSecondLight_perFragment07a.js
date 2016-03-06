@@ -40,27 +40,59 @@
 //								mouse-drags move lamp0 in the same yz plane as the camera.
 //								ALSO -- change lamp0 position to better-looking (6,5,5). 
 //								(don't forget HTML button handler 'clearDrag()' fcn below).
-//				PUZZLE:  What limits specular highlight to 45deg from world +x axis? 
-
+//	Version 06: Create GLSL struct 'LampT' & prove we can use it as a uniform
+//							that affects Vertex Shader's on-screen result (see version0 6a)
+//							In Fragment shader, create a 1-element array of 'LampT' structs 
+//							and use it to replace the uniforms for 'lamp0' (see version 06b)
+//	Version 07:	In JavaScript, use the 'materials_Ayerdi.js' library to replace //							the individual 'matl0_K...' global vars with a new 'materials' 
+//							object made of MATL_RED_PLASTIC called 'matl0' (ver. 07a).
+//							Update keypress() so that the 'm' key will change material of
+//							the sphere; move the uniform-setting for lights and materials
+//							out of main() and into the 'draw()' function: (ver. 07b)
+//
+//  Fri Feb 26 2016 in-class activity:
+//	Version 06: Step 1 to remove Global variables by object-oriented design;
+//							LET US TRY IT!   Organize collections of objects: 
+//							--Best way to create a JavaScript 'Lamp' object?
+//							--Best way to transfer contents to GLSL? GLSL 'Lamp' struct?
+// (try: https://www.opengl.org/wiki/Uniform_%28GLSL%29 
+//							--find 'struct Thingy', note how uniforms set struct contents
+//								in sequential locations, and/or fill them as arrays...
+// (try: http://wiki.lwjgl.org/wiki/GLSL_Tutorial:_Communicating_with_Shaders)
+//
 //	STILL TO DO:
+//							--add direction/spotlight mode (Lengyel, Section 7.2.4 pg. 160)
+//							by adding a 'look-at' point member.
+//							--add a user-interface to aim the spotlight ('glass cylinder'?) 
+//							--add a new light that recreates the Version 01 light at (6,6,0).
+//							--add user-interface to (fixed) light at (6,6,0).  How shall we 
+//							organize MULTIPLE lights (up to 8?) by object-oriented methods?
+
 //			--Re-organize for selectable Phong Materials (see 'materials_Ayerdi.js')
-//			--Re-organize for selectable Lamp objects (how would you do that?)
-//			--Re-organize to eliminate all these global vars!!
+//			--Further object-oriented re-organizing: can we make objects for 
+//				User-Interface? Shapes? Textures? Camera? Animation? can we fit them 
+//				inside a Scene object? etc
 
 //=============================================================================
 // Vertex shader program
 //=============================================================================
 var VSHADER_SOURCE =
-	//-------------ATTRIBUTES: of each vertex, read from our Vertex Buffer Object
+	//-------------Set precision.
+	// GLSL-ES 2.0 defaults (from spec; '4.5.3 Default Precision Qualifiers'):
+	// DEFAULT for Vertex Shaders: 	precision highp float; precision highp int;
+	//									precision lowp sampler2D; precision lowp samplerCube;
+	// DEFAULT for Fragment Shaders:  UNDEFINED for float; precision mediump int;
+	//									precision lowp sampler2D;	precision lowp samplerCube;
+																		
+	//-------------ATTRIBUTES of each vertex, read from our Vertex Buffer Object
   'attribute vec4 a_Position; \n' +		// vertex position (model coord sys)
   'attribute vec4 a_Normal; \n' +			// vertex normal vector (model coord sys)
-//  'attribute vec4 a_color;\n' + 		// What would 'per-vertex colors' mean in
-										//	in Phong lighting implementation?  disable!
-										// (LATER: replace with attrib. for diffuse reflectance?)
+
 										
 	//-------------UNIFORMS: values set from JavaScript before a drawing command.
- 	'uniform vec3 u_Kd; \n' +						//	Instead, we'll use this 'uniform' 
-													// Phong diffuse reflectance for the entire shape
+ 	'uniform vec3 u_Kd; \n' +						// Phong diffuse reflectance for the 
+ 																			// entire shape
+  'uniform int u_Kshiny;\n' +				// Phong Reflectance Exponent: 1 to 128
   'uniform mat4 u_MvpMatrix; \n' +
   'uniform mat4 u_ModelMatrix; \n' + 		// Model matrix
   'uniform mat4 u_NormalMatrix; \n' +  	// Inverse Transpose of ModelMatrix;
@@ -73,47 +105,66 @@ var VSHADER_SOURCE =
 																				// we use 'uniform' values instead)
   'varying vec4 v_Position; \n' +				
   'varying vec3 v_Normal; \n' +					// Why Vec3? its not a point, hence w==0
-//---------------
+	//-----------------------------------------------------------------------------
   'void main() { \n' +
 		// Compute CVV coordinate values from our given vertex. This 'built-in'
-		// per-vertex value gets interpolated to set screen position for each pixel.
+		// 'varying' value gets interpolated to set screen position for each pixel.
   '  gl_Position = u_MvpMatrix * a_Position;\n' +
-     // Calculate the vertex position & normal vec in the WORLD coordinate system
-     // for use as a 'varying' variable: fragment shaders get per-pixel values
-     // (interpolated between vertices for our drawing primitive (TRIANGLE)).
+		// Calculate the vertex position & normal vec in the WORLD coordinate system
+		// for use as a 'varying' variable: fragment shaders get per-pixel values
+		// (interpolated between vertices for our drawing primitive (TRIANGLE)).
   '  v_Position = u_ModelMatrix * a_Position; \n' +
 		// 3D surface normal of our vertex, in world coords.  ('varying'--its value
 		// gets interpolated (in world coords) for each pixel's fragment shader.
   '  v_Normal = normalize(vec3(u_NormalMatrix * a_Normal));\n' +
 	'	 v_Kd = u_Kd; \n' +		// find per-pixel diffuse reflectance from per-vertex
 													// (no per-pixel Ke,Ka, or Ks, but you can do it...)
-//	'  v_Kd = vec3(1.0, 1.0, 0.0); \n'	+ // TEST; fixed at green
+//	'  v_Kd = vec3(1.0, 1.0, 0.0); \n'	+ // TEST; color fixed at green
   '}\n';
 
 //=============================================================================
 // Fragment shader program
 //=============================================================================
 var FSHADER_SOURCE =
-  '#ifdef GL_ES\n' +
-  'precision mediump float;\n' +
-  '#endif\n' +
+	//-------------Set precision.
+	// GLSL-ES 2.0 defaults (from spec; '4.5.3 Default Precision Qualifiers'):
+	// DEFAULT for Vertex Shaders: 	precision highp float; precision highp int;
+	//									precision lowp sampler2D; precision lowp samplerCube;
+	// DEFAULT for Fragment Shaders:  UNDEFINED for float; precision mediump int;
+	//									precision lowp sampler2D;	precision lowp samplerCube;
+	// MATCH the Vertex shader precision for float and int:
+  'precision highp float;\n' +
+  'precision highp int;\n' +
+  //
+	//--------------- GLSL Struct Definitions:
+	'struct LampT {\n' +		// Describes one point-like Phong light source
+	'		vec3 pos;\n' +			// (x,y,z,w); w==1.0 for local light at x,y,z position
+													//		   w==0.0 for distant light from x,y,z direction 
+	' 	vec3 ambi;\n' +			// Ia ==  ambient light source strength (r,g,b)
+	' 	vec3 diff;\n' +			// Id ==  diffuse light source strength (r,g,b)
+	'		vec3 spec;\n' +			// Is == specular light source strength (r,g,b)
+	'}; \n' +
+  //
 	//-------------UNIFORMS: values set from JavaScript before a drawing command.
   // first light source: (YOU write a second one...)
-  'uniform vec3 u_Lamp0Pos;\n' + 			// Phong Illum: position
-  'uniform vec3 u_Lamp0Amb;\n' +   		// Phong Illum: ambient
-  'uniform vec3 u_Lamp0Diff;\n' +     // Phong Illum: diffuse
-	'uniform vec3 u_Lamp0Spec;\n' +			// Phong Illum: specular
+	'uniform LampT u_LampSet[1];\n' +		// Array of all light sources.
+	// OLD uniforms replaced by lampSet[0] struct's contents
+//  'uniform vec3 u_Lamp0Pos;\n' + 			// Phong Illum: position
+//  'uniform vec3 u_Lamp0Amb;\n' +   		// Phong Illum: ambient
+//  'uniform vec3 u_Lamp0Diff;\n' +     // Phong Illum: diffuse
+//	'uniform vec3 u_Lamp0Spec;\n' +			// Phong Illum: specular
+
 	
 	// first material definition: you write 2nd, 3rd, etc.
   'uniform vec3 u_Ke;\n' +						// Phong Reflectance: emissive
   'uniform vec3 u_Ka;\n' +						// Phong Reflectance: ambient
 	// no Phong Reflectance: diffuse? -- no: use v_Kd instead for per-pixel value
   'uniform vec3 u_Ks;\n' +						// Phong Reflectance: specular
-  'uniform int u_Kshiny;\n' +				// Phong Reflectance: 1 < shiny < 200
+  'uniform int u_Kshiny;\n' +				// Phong Reflectance: 1 < shiny < 128
 //
   'uniform vec3 u_eyePosWorld; \n' + 	// Camera/eye location in world coords.
   
- 	//-------------VARYING:Vertex Shader values sent per-pixel to Fragment shader: 
+ 	//-------------VARYING:Vertex Shader values sent per-pix'''''''''''''''';el to Fragment shader: 
   'varying vec3 v_Normal;\n' +				// Find 3D surface normal at each pix
   'varying vec4 v_Position;\n' +			// pixel's 3D pos too -- in 'world' coords
   'varying vec3 v_Kd;	\n' +						// Find diffuse reflectance K_d per pix
@@ -126,7 +177,7 @@ var FSHADER_SOURCE =
 	'  vec3 normal = normalize(v_Normal); \n' +
 //	'  vec3 normal = v_Normal; \n' +
      	// Find the unit-length light dir vector 'L' (surface pt --> light):
-	'  vec3 lightDirection = normalize(u_Lamp0Pos - v_Position.xyz);\n' +
+	'  vec3 lightDirection = normalize(u_LampSet[0].pos - v_Position.xyz);\n' +
 			// Find the unit-length eye-direction vector 'V' (surface pt --> camera)
   '  vec3 eyeDirection = normalize(u_eyePosWorld - v_Position.xyz); \n' +
      	// The dot product of (unit-length) light direction and the normal vector
@@ -146,22 +197,11 @@ var FSHADER_SOURCE =
 			// Try it two different ways:		The 'new hotness': pow() fcn in GLSL.
 			// CAREFUL!  pow() won't accept integer exponents! Convert K_shiny!  
 	'  float e64 = pow(nDotH, float(u_Kshiny));\n' +
-/*		
-			// or the 'old-and-busted' method of cascaded multiplies from old hardware
-			// (? "New Hotness" vs. "Old and Busted"? https://youtu.be/ha-uagjJQ9k 
-			//	it's from Men In Black II (2002; fun with early CG special effects) 
-	'  float e02 = nDotH*nDotH; \n' +
-	'  float e04 = e02*e02; \n' +
-	'  float e08 = e04*e04; \n' +
-	'	 float e16 = e08*e08; \n' +
-	'	 float e32 = e16*e16; \n' + 
-	'	 float e64 = e32*e32;	\n' +
-*/
-     	// Calculate the final color from diffuse reflection and ambient reflection
+ 	// Calculate the final color from diffuse reflection and ambient reflection
   '	 vec3 emissive = u_Ke;' +
-  '  vec3 ambient = u_Lamp0Amb * u_Ka;\n' +
-  '  vec3 diffuse = u_Lamp0Diff * v_Kd * nDotL;\n' +
-  '	 vec3 speculr = u_Lamp0Spec * u_Ks * e64;\n' +
+  '  vec3 ambient = u_LampSet[0].ambi * u_Ka;\n' +
+  '  vec3 diffuse = u_LampSet[0].diff * v_Kd * nDotL;\n' +
+  '	 vec3 speculr = u_LampSet[0].spec * u_Ks * e64;\n' +
   '  gl_FragColor = vec4(emissive + ambient + diffuse + speculr , 1.0);\n' +
   '}\n';
 //=============================================================================
@@ -219,11 +259,13 @@ var lamp0Diff = new Float32Array(3);	// r,g,b for diffuse illumination
 var lamp0Spec	= new Float32Array(3);	// r,g,b for specular illumination
 
 	// ... for our first material:
+var matl0 = new Material(MATL_RED_PLASTIC);	
 var	matl0_Ke = new Float32Array(3);					// r,g,b for emissive 'reflectance'
 var	matl0_Ka = new Float32Array(3);					// r,g,b for ambient reflectance
 var	matl0_Kd = new Float32Array(3);					// r,g,b for diffuse reflectance
 var	matl0_Ks = new Float32Array(3);					// r,g,b for specular reflectance
 var matl0_Kshiny = false;										// specular shinyness exponent.
+
 // ---------------END of global vars----------------------------
 
 //=============================================================================
@@ -288,19 +330,21 @@ function main() {
 
   // Create, save the storage locations of uniform variables: ... for the scene
   // (Version 03: changed these to global vars (DANGER!) for use inside any func)
-  uLoc_eyePosWorld = gl.getUniformLocation(gl.program, 'u_eyePosWorld');
-  uLoc_ModelMatrix = gl.getUniformLocation(gl.program, 'u_ModelMatrix');
-  uLoc_MvpMatrix = gl.getUniformLocation(gl.program, 	'u_MvpMatrix');
-  uLoc_NormalMatrix = gl.getUniformLocation(gl.program,'u_NormalMatrix');
-  if (!uLoc_ModelMatrix	|| !uLoc_MvpMatrix || !uLoc_NormalMatrix) {
+  uLoc_eyePosWorld  = gl.getUniformLocation(gl.program, 'u_eyePosWorld');
+  uLoc_ModelMatrix  = gl.getUniformLocation(gl.program, 'u_ModelMatrix');
+  uLoc_MvpMatrix    = gl.getUniformLocation(gl.program, 'u_MvpMatrix');
+  uLoc_NormalMatrix = gl.getUniformLocation(gl.program, 'u_NormalMatrix');
+  if (!uLoc_eyePosWorld ||
+      !uLoc_ModelMatrix	|| !uLoc_MvpMatrix || !uLoc_NormalMatrix) {
   	console.log('Failed to get uLoc_ matrix storage locations');
   	return;
   	}
 	//  ... for Phong light source:
-  uLoc_Lamp0Pos  = gl.getUniformLocation(gl.program, 	'u_Lamp0Pos');
-  uLoc_Lamp0Ambi  = gl.getUniformLocation(gl.program, 	'u_Lamp0Amb');
-  uLoc_Lamp0Diff = gl.getUniformLocation(gl.program, 	'u_Lamp0Diff');
-  uLoc_Lamp0Spec	= gl.getUniformLocation(gl.program,		'u_Lamp0Spec');
+	// NEW!  Note we're getting the location of a GLSL struct array member:
+  uLoc_Lamp0Pos  = gl.getUniformLocation(gl.program, 'u_LampSet[0].pos');	
+  uLoc_Lamp0Ambi = gl.getUniformLocation(gl.program, 'u_LampSet[0].ambi');
+  uLoc_Lamp0Diff = gl.getUniformLocation(gl.program, 'u_LampSet[0].diff');
+  uLoc_Lamp0Spec = gl.getUniformLocation(gl.program, 'u_LampSet[0].spec');
   if( !uLoc_Lamp0Pos || !uLoc_Lamp0Ambi	|| !uLoc_Lamp0Diff || !uLoc_Lamp0Spec	) {
     console.log('Failed to get the Lamp0 storage locations');
     return;
@@ -333,18 +377,26 @@ function main() {
   gl.uniform3fv(uLoc_Lamp0Ambi, lamp0Ambi);		// ambient
   gl.uniform3fv(uLoc_Lamp0Diff, lamp0Diff);		// diffuse
   gl.uniform3fv(uLoc_Lamp0Spec, lamp0Spec);		// Specular
+
 	// Init reflectance values for our (first) Phong material in global variables;
-	matl0_Ke.set([0.0, 0.0, 0.0]);
-	matl0_Ka.set([0.6, 0.0, 0.0]);
-	matl0_Kd.set([0.8, 0.0, 0.0]);
-	matl0_Ks.set([0.8, 0.8, 0.8]);
-	matl0_Kshiny = 16;													// Specular shinyness exponent
-	// then use those global vars to set 'uniform' vars in the GPU:
-	gl.uniform3fv(uLoc_Ke, matl0_Ke);				// Ke emissive
-	gl.uniform3fv(uLoc_Ka, matl0_Ka);				// Ka ambient
-  gl.uniform3fv(uLoc_Kd, matl0_Kd);				// Kd	diffuse
-	gl.uniform3fv(uLoc_Ks, matl0_Ks);				// Ks specular
-	gl.uniform1i(uLoc_Kshiny, matl0_Kshiny);					// Kshiny shinyness exponent
+	// REPLACE with MATL_RED_PLASTIC in new 'Material' object matl0(global var)
+//	 matl0_Ke.set([0.0, 0.0, 0.0]);
+//	 matl0_Ka.set([0.6, 0.0, 0.0]);
+//	 matl0_Kd.set([0.8, 0.0, 0.0]);
+//	 matl0_Ks.set([0.8, 0.8, 0.8]);
+//	 matl0_Kshiny = 16;				// Specular shinyness exponent
+	// then use those Material values to set 'uniform' vars in the GPU:
+
+// Test matl object:
+// console.log('matl0.K_emit', matl0.K_emit.slice(0,3), '\n');
+// (Why 'slice(0,4)'? 
+//	this takes only 1st 3 elements (r,g,b) of array, ignores 4th element (alpha))
+	gl.uniform3fv(uLoc_Ke, matl0.K_emit.slice(0,3));				// Ke emissive
+	gl.uniform3fv(uLoc_Ka, matl0.K_ambi.slice(0,3));				// Ka ambient
+  gl.uniform3fv(uLoc_Kd, matl0.K_diff.slice(0,3));				// Kd	diffuse
+	gl.uniform3fv(uLoc_Ks, matl0.K_spec.slice(0,3));				// Ks specular
+	gl.uniform1i(uLoc_Kshiny, parseInt(matl0.K_shiny));     // Kshiny 
+	//	== specular exponent; parseInt() converts from float to base-10 integer.
 	
 	draw();
 }
@@ -679,5 +731,6 @@ function myKeyPress(ev) {
 													', altKey='   +ev.altKey   +
 													', metaKey(Command key or Windows key)='+ev.metaKey);
 		break;
-	}												
+	}
 }
+
