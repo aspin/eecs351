@@ -80,7 +80,6 @@ function getVertices() {
   }
 
   // star
-
   drawUtil.addVertex('o', 0, 0, 0.3);
   drawUtil.addVertex('+sx', 1, 0, 0.3);
   drawUtil.addVertex('-sx', -1, 0, 0.3);

@@ -1,9 +1,7 @@
 var VSHADER = 'vShared',
     FSHADER = 'fShared';
 
-var SPIN_CONSTANT = 0.5;
-var dragging = false,
-    swingLeft = true;
+var dragging = false;
 
 function main() {
   loadShaders(function(sources) {
@@ -56,7 +54,7 @@ function main() {
     );
 
     setupMouseHandlers(gl, canvas, shapes);
-    setupKeyboardHandlers(gl, canvas, shapes, eye);
+    setupKeyboardHandlers(eye);
 
     var animate = function() {
       // Autostretch
@@ -72,44 +70,44 @@ function main() {
 }
 
 function loadShaders(callback) {
-  //  var vShaderSrc = new XMLHttpRequest(),
-  //      fShaderSrc = new XMLHttpRequest();
-   //
-  //  var oneCompleted = false;
-  //  var sources = {};
-  //  var initialize = function(shaderName, shaderSource) {
-  //    sources[shaderName] = shaderSource;
-  //    if (oneCompleted) {
-  //      callback(sources);
-  //    } else {
-  //      oneCompleted = true;
-  //    }
-  //  };
-   //
-  //  vShaderSrc.open('GET', '/shaders/vshader.esgl');
-  //  fShaderSrc.open('GET', '/shaders/fshader.esgl');
-  //  vShaderSrc.onreadystatechange = function() {
-  //    if (vShaderSrc.readyState === 4 && vShaderSrc.status === 200) {
-  //      initialize(VSHADER, vShaderSrc.responseText);
-  //    }
-  //  };
-  //  fShaderSrc.onreadystatechange = function() {
-  //    if (fShaderSrc.readyState === 4 && fShaderSrc.status === 200) {
-  //      initialize(FSHADER, fShaderSrc.responseText);
-  //    }
-  //  };
-  //  vShaderSrc.send();
-  //  fShaderSrc.send();
+    var vShaderSrc = new XMLHttpRequest(),
+        fShaderSrc = new XMLHttpRequest();
+
+    var oneCompleted = false;
+    var sources = {};
+    var initialize = function(shaderName, shaderSource) {
+      sources[shaderName] = shaderSource;
+      if (oneCompleted) {
+        callback(sources);
+      } else {
+        oneCompleted = true;
+      }
+    };
+
+    vShaderSrc.open('GET', '/shaders/vshader.esgl');
+    fShaderSrc.open('GET', '/shaders/fshader.esgl');
+    vShaderSrc.onreadystatechange = function() {
+      if (vShaderSrc.readyState === 4 && vShaderSrc.status === 200) {
+        initialize(VSHADER, vShaderSrc.responseText);
+      }
+    };
+    fShaderSrc.onreadystatechange = function() {
+      if (fShaderSrc.readyState === 4 && fShaderSrc.status === 200) {
+        initialize(FSHADER, fShaderSrc.responseText);
+      }
+    };
+    vShaderSrc.send();
+    fShaderSrc.send();
 
   // FOR HTML OPEN:
-  var sources = {};
-  sources[FSHADER] = 'precision mediump float;\nvarying vec4 v_Color;\nvoid main() {\ngl_FragColor = v_Color;\n}\n';
-  sources[VSHADER] = 'attribute vec4 a_Position;attribute vec4 a_Normal;attribute vec4 a_Color;' +
-                     'uniform mat4 u_MvpMatrix;uniform mat4 u_NormalMatrix;uniform vec3 u_LightDirection;' +
-                     'varying vec4 v_Color;void main() {gl_Position = u_MvpMatrix*a_Position;gl_PointSize = 10.0;' +
-                     'vec4 normal=u_NormalMatrix*a_Normal;float nDotL=clamp(dot(normalize(normal.xyz), normalize(u_LightDirection)), 0.0, 1.0);' +
-                     'v_Color = vec4(a_Color.xyz * (0.3 + 0.7 * nDotL), a_Color.a);}';
-  callback(sources);
+  //var sources = {};
+  //sources[FSHADER] = 'precision mediump float;\nvarying vec4 v_Color;\nvoid main() {\ngl_FragColor = v_Color;\n}\n';
+  //sources[VSHADER] = 'attribute vec4 a_Position;attribute vec4 a_Normal;attribute vec4 a_Color;' +
+  //                   'uniform mat4 u_MvpMatrix;uniform mat4 u_NormalMatrix;uniform vec3 u_LightDirection;' +
+  //                   'varying vec4 v_Color;void main() {gl_Position = u_MvpMatrix*a_Position;gl_PointSize = 10.0;' +
+  //                   'vec4 normal=u_NormalMatrix*a_Normal;float nDotL=clamp(dot(normalize(normal.xyz), normalize(u_LightDirection)), 0.0, 1.0);' +
+  //                   'v_Color = vec4(a_Color.xyz * (0.3 + 0.7 * nDotL), a_Color.a);}';
+  //callback(sources);
 }
 
 function initWebGL(canvas, sources) {
@@ -239,10 +237,7 @@ function computeMovement(eye, scale) {
   return vector;
 }
 
-function setupKeyboardHandlers(gl, canvas, shapes, eye) {
-  var morningStar = shapes[0],
-      joint = shapes[1];
-
+function setupKeyboardHandlers(eye) {
   window.onkeypress = function (event) {
     switch (event.keyCode) {
       case 119: // w, for up
@@ -250,14 +245,12 @@ function setupKeyboardHandlers(gl, canvas, shapes, eye) {
         break;
       case 97: // a, for left
         angle = (angle + 0.05) % (2 * Math.PI);
-        console.log(angle);
         var newLocation = computePosition(eye, angle);
         eye.looking.x = newLocation[0];
         eye.looking.y = newLocation[1];
         break;
       case 100: // d, for right
         angle = (angle - 0.05) % (2 * Math.PI);
-        console.log(angle);
         var newLocation = computePosition(eye, angle);
         eye.looking.x = newLocation[0];
         eye.looking.y = newLocation[1];
@@ -289,17 +282,10 @@ function draw(gl, canvas, modelMatrix, viewMatrix, projMatrix, normalMatrix, u_M
   viewMatrix.setLookAt(eye.position.x, eye.position.y, eye.position.z,
                        eye.looking.x, eye.looking.y, eye.looking.z,
                        eye.up.x, eye.up.y, eye.up.z);
-  var aspectRatio = canvas.width / canvas.height / 2;
+  var aspectRatio = canvas.width / canvas.height;
 
-  gl.viewport(0, 0, canvas.width / 2, canvas.height);
+  gl.viewport(0, 0, canvas.width, canvas.height);
   projMatrix.setPerspective(40, aspectRatio, 1, 100);
-  for(var i in shapes) {
-    shapes[i].draw(gl, modelMatrix, viewMatrix, projMatrix, normalMatrix, u_MvpMatrix, u_NormalMatrix);
-  }
-
-  gl.viewport(canvas.width / 2, 0, canvas.width / 2,  canvas.height);
-  projMatrix.setOrtho(-1 * aspectRatio, aspectRatio, -1, 1, 0, 1000);
-
   for(var i in shapes) {
     shapes[i].draw(gl, modelMatrix, viewMatrix, projMatrix, normalMatrix, u_MvpMatrix, u_NormalMatrix);
   }
@@ -307,7 +293,6 @@ function draw(gl, canvas, modelMatrix, viewMatrix, projMatrix, normalMatrix, u_M
 
 function updateShapes(shapes) {
   if (!dragging) {
-    var morningStar = shapes[0];
     var joint = shapes[1];
 
     joint.out.rotation.z -= 1;
