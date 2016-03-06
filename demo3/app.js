@@ -34,7 +34,7 @@ function main() {
       0.1,
       new Rotation(0, 0, 0, 0, 0, 0)
     ));
-    shapes.push(new Pyramid(
+    shapes.push(new LonelyPyramid(
       new Coordinate(0.8, -1, 0.1),
       0.1,
       new Rotation(0, 0, 0, 0, 0, 0)
