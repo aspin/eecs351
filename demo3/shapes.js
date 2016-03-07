@@ -50,7 +50,7 @@ function Cube(position, scale, rotation) {
     new Coordinate(scale, scale, scale), rotation, new Coordinate(0, 0, 0));
 }
 
-Cube.prototype.draw = function(gl, modelMatrix, viewMatrix, projMatrix, normalMatrix, u_MvpMatrix, u_NormalMatrix) {
+Cube.prototype.draw = function(gl, modelMatrix, viewMatrix, projMatrix, normalMatrix, u_ModelMatrix, u_MvpMatrix, u_NormalMatrix) {
   modelMatrix.setTranslate(0, 0, 0);
   this.cube.draw.apply(this.cube, arguments);
 };
@@ -60,7 +60,7 @@ function LonelyPyramid(position, scale, rotation) {
     new Coordinate(scale, scale, scale), rotation, new Coordinate(0, 0, 0));
 }
 
-LonelyPyramid.prototype.draw = function(gl, modelMatrix, viewMatrix, projMatrix, normalMatrix, u_MvpMatrix, u_NormalMatrix) {
+LonelyPyramid.prototype.draw = function(gl, modelMatrix, viewMatrix, projMatrix, normalMatrix, u_ModelMatrix, u_MvpMatrix, u_NormalMatrix) {
   modelMatrix.setTranslate(0, 0, 0);
   this.pyramid.draw.apply(this.pyramid, arguments);
 };
@@ -74,7 +74,7 @@ function House(position, scale, rotation) {
     rotation, new Coordinate(0, 0, 0));
 }
 
-House.prototype.draw = function(gl, modelMatrix, viewMatrix, projMatrix, normalMatrix, u_MvpMatrix, u_NormalMatrix) {
+House.prototype.draw = function(gl, modelMatrix, viewMatrix, projMatrix, normalMatrix, u_ModelMatrix, u_MvpMatrix, u_NormalMatrix) {
   modelMatrix.setTranslate(0, 0, 0);
   this.base.draw.apply(this.base, arguments);
   undoScale(this.base, modelMatrix);
@@ -105,7 +105,7 @@ function MorningStar(position, scale, rotation) {
     new Coordinate(0, 0, 0));
 }
 
-MorningStar.prototype.draw = function(gl, modelMatrix, viewMatrix, projMatrix, normalMatrix, u_MvpMatrix, u_NormalMatrix) {
+MorningStar.prototype.draw = function(gl, modelMatrix, viewMatrix, projMatrix, normalMatrix, u_ModelMatrix, u_MvpMatrix, u_NormalMatrix) {
   modelMatrix.setTranslate(0, 0, 0);
   this.slider.draw.apply(this.slider, arguments);
   undoScale(this.slider, modelMatrix);
@@ -159,7 +159,7 @@ function Joint(position, scale, rotation) {
     new Coordinate(0, scale * 1.5, 0));
 }
 
-Joint.prototype.draw = function(gl, modelMatrix, viewMatrix, projMatrix, normalMatrix, u_MvpMatrix, u_NormalMatrix) {
+Joint.prototype.draw = function(gl, modelMatrix, viewMatrix, projMatrix, normalMatrix, u_ModelMatrix, u_MvpMatrix, u_NormalMatrix) {
   modelMatrix.setTranslate(0, 0, 0);
 
   this.out.draw.apply(this.out, arguments);
@@ -178,12 +178,6 @@ Joint.prototype.draw = function(gl, modelMatrix, viewMatrix, projMatrix, normalM
   undoScale(this.bend3, modelMatrix);
   this.end.draw.apply(this.end, arguments);
   undoScale(this.end, modelMatrix);
-  drawAxes(gl, modelMatrix, viewMatrix, projMatrix, normalMatrix, u_MvpMatrix, u_NormalMatrix,
-    new Coordinate(0, 0, 0),
-    new Coordinate(1, 1, 1),
-    new Rotation(this.end.rotation.x, this.end.rotation.y, this.end.rotation.z,
-      this.end.rotation.xy, this.end.rotation.xz, this.end.rotation.yz),
-    new Coordinate(this.end.origin.x, this.end.origin.y, this.end.origin.z));
 };
 
 function undoScale(property, modelMatrix) {
@@ -200,13 +194,13 @@ function Shape(position, scale, rotation, origin, material) {
   this.length = 0;
 }
 
-Shape.prototype.draw = function(gl, modelMatrix, viewMatrix, projMatrix, normalMatrix, u_MvpMatrix, u_NormalMatrix) {
+Shape.prototype.draw = function(gl, modelMatrix, viewMatrix, projMatrix, normalMatrix, u_ModelMatrix, u_MvpMatrix, u_NormalMatrix) {
   updateMatrices(modelMatrix, viewMatrix, projMatrix, normalMatrix,
     new Coordinate(this.scale.x, this.scale.y, this.scale.z),
     new Rotation(this.rotation.x, this.rotation.y, this.rotation.z, this.rotation.xy, this.rotation.xz, this.rotation.yz),
     new Coordinate(this.origin.x, this.origin.y, this.origin.z),
     new Coordinate(this.position.x, this.position.y, this.position.z));
-  injectMvpMatrix(gl, modelMatrix, viewMatrix, projMatrix, normalMatrix, u_MvpMatrix, u_NormalMatrix);
+  injectMvpMatrix(gl, modelMatrix, viewMatrix, projMatrix, normalMatrix, u_ModelMatrix, u_MvpMatrix, u_NormalMatrix);
   gl.drawArrays(gl.TRIANGLES, this.start, this.length);
 };
 
@@ -242,7 +236,7 @@ function Pyramid() {
 
 Pyramid.prototype = new Shape();
 
-function injectMvpMatrix(gl, modelMatrix, viewMatrix, projMatrix, normalMatrix, u_MvpMatrix, u_NormalMatrix) {
+function injectMvpMatrix(gl, modelMatrix, viewMatrix, projMatrix, normalMatrix, u_ModelMatrix, u_MvpMatrix, u_NormalMatrix) {
   // cloning projMatrix
   var tempProjMatrix = new Matrix4();
   tempProjMatrix.elements = new Float32Array(projMatrix.elements.slice(0));
@@ -254,6 +248,7 @@ function injectMvpMatrix(gl, modelMatrix, viewMatrix, projMatrix, normalMatrix, 
 
   var mvpMatrix = tempProjMatrix.multiply(tempViewMatrix);
 
+  gl.uniformMatrix4fv(u_ModelMatrix, false, modelMatrix.elements);
   gl.uniformMatrix4fv(u_MvpMatrix, false, mvpMatrix.elements);
   gl.uniformMatrix4fv(u_NormalMatrix, false, normalMatrix.elements);
 }
