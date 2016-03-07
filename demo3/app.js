@@ -242,9 +242,9 @@ function computeMovement(eye, scale) {
     Math.pow(vector.z, 2)
   );
   //magnitude += scale;
-  vector.x /= magnitude;
-  vector.y /= magnitude;
-  vector.z /= magnitude;
+  vector.x /= magnitude / scale;
+  vector.y /= magnitude / scale;
+  vector.z /= magnitude / scale;
   return vector;
 }
 

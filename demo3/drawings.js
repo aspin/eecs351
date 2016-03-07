@@ -203,8 +203,8 @@ function getVertices() {
   drawUtil.addTriangle('gt1', 'glt', 'grt', 'glb');
   drawUtil.addTriangle('gt2', 'grt', 'grb', 'glb');
 
-  drawUtil.addNormal('gt1', 1.0, 1.0, 1.0);
-  drawUtil.addNormal('gt2', 1.0, 1.0, 1.0);
+  drawUtil.addNormal('gt1', 0.0, 0.0, 1.0);
+  drawUtil.addNormal('gt2', 0.0, 0.0, 1.0);
 
   var groundTriangles = [ 'gt1', 'gt2' ];
 
