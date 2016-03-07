@@ -194,40 +194,21 @@ function getVertices() {
   pTriangles.push('ptbs1');
   pTriangles.push('ptbs2');
 
-  var triangles = rectangleTris.concat(icosaTriangles).concat(starTriangles).concat(pTriangles);
+  // ground
+  drawUtil.addVertex('glt', -50.0, -50.0, 0.0);
+  drawUtil.addVertex('grt', -50.0, 50.0, 0.0);
+  drawUtil.addVertex('glb', 50.0, -50.0, 0.0);
+  drawUtil.addVertex('grb', 50.0, 50.0, 0.0);
+
+  drawUtil.addTriangle('gt1', 'glt', 'grt', 'glb');
+  drawUtil.addTriangle('gt2', 'grt', 'grb', 'glb');
+
+  drawUtil.addNormal('gt1', 1.0, 1.0, 1.0);
+  drawUtil.addNormal('gt2', 1.0, 1.0, 1.0);
+
+  var groundTriangles = [ 'gt1', 'gt2' ];
+
+  var triangles = rectangleTris.concat(icosaTriangles).concat(starTriangles).concat(pTriangles).concat(groundTriangles);
   var trianglesArray = drawUtil.exportTriangles(triangles);
-  
-  var vertex,
-      min = -50,
-      max = 50;
-  var groundVertices = new Float32Array(9 * 2 * 2 * 100); // 100 lines, x and y direction
-
-  // x lines, light from all angles
-  for(i = 0; i < 100; i++) {
-    vertex = new Float32Array([i + min, min, 0.0, 1.0, 1.0, 0.3, 1.0, 1.0, 1.0,
-                               i + min, max, 0.0, 1.0, 1.0, 0.3, 1.0, 1.0, 1.0]);
-    groundVertices.set(vertex, i * 18);
-  }
-
-  // y lines
-  for(i = 0; i < 100; i++) {
-    vertex = new Float32Array([min, i + min, 0.0, 0.5, 1.0, 0.5, 1.0, 1.0, 1.0,
-                               max, i + min, 0.0, 0.5, 1.0, 0.5, 1.0, 1.0, 1.0]);
-    groundVertices.set(vertex, (i + 100) * 18);
-  }
-
-  var axesVertices = new Float32Array([
-    1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 1.0, 1.0,
-    -1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 1.0, 1.0,
-    0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 1.0,
-    0.0, -1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 1.0,
-    0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0,
-    0.0, 0.0, -1.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0
-  ]);
-
-  var finalArray = new Float32Array(trianglesArray.length + axesVertices.length + groundVertices.length);
-  finalArray.set(trianglesArray);
-  finalArray.set(axesVertices, trianglesArray.length);
-  finalArray.set(groundVertices, trianglesArray.length + axesVertices.length);
-  return finalArray;
+  return trianglesArray;
 }

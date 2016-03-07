@@ -52,12 +52,6 @@ Light.prototype.setLights = function(options) {
   this.gl.uniform3fv(this.u_LightAmb, this.lightAmb);
   this.gl.uniform3fv(this.u_LightDiff, this.lightDiff);
   this.gl.uniform3fv(this.u_LightSpec, this.lightSpec);
-
-  //this.gl.uniform3fv(this.u_Ke, this.matl_Ke);
-  //this.gl.uniform3fv(this.u_Ka, this.matl_Ka);
-  //this.gl.uniform3fv(this.u_Kd, this.matl_Kd);
-  //this.gl.uniform3fv(this.u_Ks, this.matl_Ks);
-  //this.gl.uniform1i(this.u_Kshiny, this.matl_Kshiny);
 };
 
 Light.prototype.updateLights = function(viewMatrix) {
@@ -156,6 +150,3 @@ function LightGUI(light, draw) {
     self.draw();
   });
 }
-
-
-

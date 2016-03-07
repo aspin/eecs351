@@ -17,24 +17,9 @@ function Eye(position, looking, up) {
   this.up = up;
 }
 
-function Axes() {
+function GroundGrid() {
   this.start = 210;
   this.size = 6;
-}
-
-Axes.prototype.draw = function(gl, modelMatrix, viewMatrix, projMatrix, normalMatrix, u_MvpMatrix, u_NormalMatrix) {
-  modelMatrix.setTranslate(0, 0, 0);
-  drawAxes(gl, modelMatrix, viewMatrix, projMatrix, normalMatrix, u_MvpMatrix, u_NormalMatrix,
-    new Coordinate(0, 0, 0.1),
-    new Coordinate(4, 4, 4),
-    new Rotation(0, 0, 0, 0, 0, 0),
-    new Coordinate(0, 0, 0)
-  );
-};
-
-function GroundGrid() {
-  this.start = 216;
-  this.size = 400;
 }
 
 GroundGrid.prototype.draw = function(gl, modelMatrix, viewMatrix, projMatrix, normalMatrix, u_ModelMatrix, u_MvpMatrix, u_NormalMatrix, light) {
@@ -43,7 +28,7 @@ GroundGrid.prototype.draw = function(gl, modelMatrix, viewMatrix, projMatrix, no
   normalMatrix.transpose();
   light.setMaterial(new Material(MATL_SILVER_SHINY));
   injectMvpMatrix(gl, modelMatrix, viewMatrix, projMatrix, normalMatrix, u_ModelMatrix, u_MvpMatrix, u_NormalMatrix);
-  gl.drawArrays(gl.LINES, this.start, this.size);
+  gl.drawArrays(gl.TRIANGLES, this.start, this.size);
 };
 
 function Cube(position, scale, rotation) {

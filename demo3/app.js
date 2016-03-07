@@ -319,18 +319,18 @@ function updateShapes(shapes) {
   if (!dragging) {
     var morning = shapes[0],
         joint = shapes[1],
+        cube = shapes[2],
+        pyramid = shapes[3]
         house = shapes[4];
 
     morning.slider.rotation.x += 1;
 
     joint.out.rotation.z -= 1;
-    joint.out.rotation.y -= 1;
-    joint.bend.rotation.y -= 1;
-    joint.bend2.rotation.x -= 1;
-    joint.bend3.rotation.x -= 1;
     joint.end.rotation.x -= 3;
 
+    cube.cube.rotation.x += 3;
+    pyramid.pyramid.rotation.z += 5;
+
     house.base.rotation.z += 1;
-    //house.roof.rotation.z += 1;
   }
 }
