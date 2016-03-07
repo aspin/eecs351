@@ -300,7 +300,7 @@ function draw(gl, canvas, modelMatrix, viewMatrix, projMatrix, normalMatrix,
                        eye.up.x, eye.up.y, eye.up.z);
   var aspectRatio = canvas.width / canvas.height;
 
-  light.updateLights();
+  light.updateLights(viewMatrix);
   gl.viewport(0, 0, canvas.width, canvas.height);
   projMatrix.setPerspective(40, aspectRatio, 1, 100);
   for(var i in shapes) {

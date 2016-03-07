@@ -255,11 +255,10 @@ function injectMvpMatrix(gl, modelMatrix, viewMatrix, projMatrix, normalMatrix, 
   var tempViewMatrix = new Matrix4();
   tempViewMatrix.elements = new Float32Array(viewMatrix.elements.slice(0));
   tempViewMatrix.multiply(modelMatrix);
-  normalMatrix.setInverseOf(modelMatrix);
+  normalMatrix.setInverseOf(tempViewMatrix);
   normalMatrix.transpose();
 
   var mvpMatrix = tempProjMatrix.multiply(tempViewMatrix);
-
   gl.uniformMatrix4fv(u_ModelMatrix, false, tempViewMatrix.elements);
   gl.uniformMatrix4fv(u_MvpMatrix, false, mvpMatrix.elements);
   gl.uniformMatrix4fv(u_NormalMatrix, false, normalMatrix.elements);

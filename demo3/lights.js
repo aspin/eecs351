@@ -55,7 +55,8 @@ Light.prototype.setLights = function(options) {
 };
 
 Light.prototype.updateLights = function(viewMatrix) {
-  this.gl.uniform3fv(this.u_LightPos, this.lightPos.elements);
+  var lightPosition = viewMatrix.multiplyVector3(this.lightPos);
+  this.gl.uniform3fv(this.u_LightPos, lightPosition.elements);
   this.gl.uniform3fv(this.u_LightAmb, this.lightAmb);
   this.gl.uniform3fv(this.u_LightDiff, this.lightDiff);
   this.gl.uniform3fv(this.u_LightSpec, this.lightSpec);
