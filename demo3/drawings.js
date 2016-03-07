@@ -211,8 +211,6 @@ function getVertices() {
   var triangles = rectangleTris.concat(icosaTriangles).concat(starTriangles).concat(pTriangles).concat(groundTriangles);
   var trianglesArray = drawUtil.exportTriangles(triangles);
 
-  // return trianglesArray;
-
   // sphere
   var floatsPerVertex = 9
   var zAxisSlices = 13;

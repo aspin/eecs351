@@ -248,6 +248,22 @@ function computeMovement(eye, scale) {
   return vector;
 }
 
+function computeLateralMovement(eye, scale) {
+  var vector = { x: eye.position.y - eye.looking.y,
+                 y: - eye.position.x + eye.looking.x,
+                 z: eye.position.z - eye.looking.z };
+  var magnitude = Math.sqrt(
+    Math.pow(vector.x, 2) +
+    Math.pow(vector.y, 2) +
+    Math.pow(vector.z, 2)
+  );
+  //magnitude += scale;
+  vector.x /= magnitude / scale;
+  vector.y /= magnitude / scale;
+  vector.z /= magnitude / scale;
+  return vector;
+}
+
 function setupKeyboardHandlers(eye) {
   window.onkeypress = function (event) {
     switch (event.keyCode) {
@@ -270,8 +286,22 @@ function setupKeyboardHandlers(eye) {
         eye.looking.z -= 0.08;
         break;
       case 104: // h, pan left
+        var movementVector = computeLateralMovement(eye, 0.5);
+        eye.position.x -= movementVector.x;
+        eye.position.y -= movementVector.y;
+        // eye.position.z -= movementVector.z;
+        eye.looking.x -= movementVector.x;
+        eye.looking.y -= movementVector.y;
+        // eye.looking.z -= movementVector.z;
         break;
       case 108: // l, pan right
+        var movementVector = computeLateralMovement(eye, 0.5);
+        eye.position.x += movementVector.x;
+        eye.position.y += movementVector.y;
+        // eye.position.z += movementVector.z;
+        eye.looking.x += movementVector.x;
+        eye.looking.y += movementVector.y;
+        // eye.looking.z += movementVector.z;
         break;
       case 106: //j, for moving forward
         var movementVector = computeMovement(eye, 0.5);
