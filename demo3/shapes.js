@@ -37,11 +37,12 @@ function GroundGrid() {
   this.size = 400;
 }
 
-GroundGrid.prototype.draw = function(gl, modelMatrix, viewMatrix, projMatrix, normalMatrix, u_MvpMatrix, u_NormalMatrix) {
+GroundGrid.prototype.draw = function(gl, modelMatrix, viewMatrix, projMatrix, normalMatrix, u_ModelMatrix, u_MvpMatrix, u_NormalMatrix, light) {
   modelMatrix.setTranslate(0, 0, 0);
   normalMatrix.setInverseOf(modelMatrix);
   normalMatrix.transpose();
-  injectMvpMatrix(gl, modelMatrix, viewMatrix, projMatrix, normalMatrix, u_MvpMatrix, u_NormalMatrix);
+  light.setMaterial(new Material(MATL_SILVER_SHINY));
+  injectMvpMatrix(gl, modelMatrix, viewMatrix, projMatrix, normalMatrix, u_ModelMatrix, u_MvpMatrix, u_NormalMatrix);
   gl.drawArrays(gl.LINES, this.start, this.size);
 };
 
@@ -74,7 +75,7 @@ function House(position, scale, rotation) {
   );
   this.roof = new Pyramid(
     new Coordinate(0, 0, scale * 0.9),
-    new Coordinate(scale * 1.3, scale * 1.3, scale * 1.3),
+    new Coordinate(scale * 1.5, scale * 1.5, scale * 1.5),
     rotation, new Coordinate(0, 0, 0),
     new Material(MATL_RUBY)
   );
@@ -207,16 +208,12 @@ Shape.prototype.draw = function(gl, modelMatrix, viewMatrix, projMatrix, normalM
     new Rotation(this.rotation.x, this.rotation.y, this.rotation.z, this.rotation.xy, this.rotation.xz, this.rotation.yz),
     new Coordinate(this.origin.x, this.origin.y, this.origin.z),
     new Coordinate(this.position.x, this.position.y, this.position.z));
-  this.updateLights(light);
-  injectMvpMatrix(gl, modelMatrix, viewMatrix, projMatrix, normalMatrix, u_ModelMatrix, u_MvpMatrix, u_NormalMatrix);
-  gl.drawArrays(gl.TRIANGLES, this.start, this.length);
-};
-
-Shape.prototype.updateLights = function(light) {
   light.reset();
   if (this.material) {
     light.setMaterial(this.material);
   }
+  injectMvpMatrix(gl, modelMatrix, viewMatrix, projMatrix, normalMatrix, u_ModelMatrix, u_MvpMatrix, u_NormalMatrix);
+  gl.drawArrays(gl.TRIANGLES, this.start, this.length);
 };
 
 function Rectangle() {

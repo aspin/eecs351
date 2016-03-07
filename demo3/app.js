@@ -19,18 +19,16 @@ function main() {
         u_MvpMatrix = matrices[1],
         u_NormalMatrix = matrices[2];
 
-    //var u_eyePosWorld = gl.getUniformLocation(gl.program, 'u_eyePosWorld');
-    //gl.uniform3fv(u_eyePosWorld, [0.0, 0.0, 0.0]);
     var light = new Light(gl);
     light.setLights({
       pos: [0.0, 0.0, 100.0],
       amb: [1.0, 1.0, 1.0],
       diff: [1.0, 1.0, 1.0],
       spec: [1.0, 1.0, 1.0],
-      ke: [0.8, 0.8, 0.8],
-      ka: [0.6, 0.6, 0.6],
-      kd: [0.8, 0.8, 0.8],
-      ks: [0.8, 0.8, 0.8],
+      ke: [1.0, 1.0, 1.0],
+      ka: [1.0, 1.0, 1.0],
+      kd: [1.0, 1.0, 1.0],
+      ks: [1.0, 1.0, 1.0],
       kshiny: 128
     });
 
@@ -293,12 +291,12 @@ function setupKeyboardHandlers(eye) {
 function draw(gl, canvas, modelMatrix, viewMatrix, projMatrix, normalMatrix,
               u_ModelMatrix, u_MvpMatrix, u_NormalMatrix, shapes, eye, light) {
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-  light.updateLights();
   viewMatrix.setLookAt(eye.position.x, eye.position.y, eye.position.z,
                        eye.looking.x, eye.looking.y, eye.looking.z,
                        eye.up.x, eye.up.y, eye.up.z);
   var aspectRatio = canvas.width / canvas.height;
 
+  light.updateLights();
   gl.viewport(0, 0, canvas.width, canvas.height);
   projMatrix.setPerspective(40, aspectRatio, 1, 100);
   for(var i in shapes) {

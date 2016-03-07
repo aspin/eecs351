@@ -31,7 +31,7 @@ function Light(gl) {
 }
 
 Light.prototype.setLights = function(options) {
-  this.lightPos.set(options.pos);
+  this.lightPos = new Vector3(options.pos);
   this.lightAmb.set(options.amb);
   this.lightDiff.set(options.diff);
   this.lightSpec.set(options.spec);
@@ -42,7 +42,7 @@ Light.prototype.setLights = function(options) {
   this.matl_Ks.set(options.ks);
   this.matl_Kshiny = options.kshiny;
 
-  this.gl.uniform3fv(this.u_LightPos, this.lightPos);
+  this.gl.uniform3fv(this.u_LightPos, this.lightPos.elements);
   this.gl.uniform3fv(this.u_LightAmb, this.lightAmb);
   this.gl.uniform3fv(this.u_LightDiff, this.lightDiff);
   this.gl.uniform3fv(this.u_LightSpec, this.lightSpec);
@@ -54,8 +54,8 @@ Light.prototype.setLights = function(options) {
   //this.gl.uniform1i(this.u_Kshiny, this.matl_Kshiny);
 };
 
-Light.prototype.updateLights = function() {
-  this.gl.uniform3fv(this.u_LightPos, this.lightPos);
+Light.prototype.updateLights = function(viewMatrix) {
+  this.gl.uniform3fv(this.u_LightPos, this.lightPos.elements);
   this.gl.uniform3fv(this.u_LightAmb, this.lightAmb);
   this.gl.uniform3fv(this.u_LightDiff, this.lightDiff);
   this.gl.uniform3fv(this.u_LightSpec, this.lightSpec);
@@ -83,9 +83,9 @@ function LightGUI(light, draw) {
   this.light = light;
   this.draw = draw;
 
-  this.lightX = this.light.lightPos[0];
-  this.lightY = this.light.lightPos[1];
-  this.lightZ = this.light.lightPos[2];
+  this.lightX = this.light.lightPos.elements[0];
+  this.lightY = this.light.lightPos.elements[1];
+  this.lightZ = this.light.lightPos.elements[2];
   this.ambientR = this.light.lightAmb[0];
   this.ambientG = this.light.lightAmb[1];
   this.ambientB = this.light.lightAmb[2];
@@ -98,50 +98,50 @@ function LightGUI(light, draw) {
 
   var gui = new dat.GUI();
   gui.add(self, 'lightX').step(0.2).onChange(function(newValue) {
-    self.light.lightPos[0] = newValue;
+    self.light.lightPos.elements[0] = newValue;
     self.draw();
   });
   gui.add(self, 'lightY').step(0.2).onChange(function(newValue) {
-    self.light.lightPos[1] = newValue;
+    self.light.lightPos.elements[1] = newValue;
     self.draw();
   });
   gui.add(self, 'lightZ').step(0.2).onChange(function(newValue) {
-    self.light.lightPos[2] = newValue;
+    self.light.lightPos.elements[2] = newValue;
     self.draw();
   });
-  gui.add(self, 'ambientR').step(0.2).onChange(function(newValue) {
+  gui.add(self, 'ambientR', 0, 1).step(0.05).onChange(function(newValue) {
     self.light.lightAmb[0] = newValue;
     self.draw();
   });
-  gui.add(self, 'ambientG').step(0.2).onChange(function(newValue) {
+  gui.add(self, 'ambientG', 0, 1).step(0.05).onChange(function(newValue) {
     self.light.lightAmb[1] = newValue;
     self.draw();
   });
-  gui.add(self, 'ambientB').step(0.2).onChange(function(newValue) {
+  gui.add(self, 'ambientB', 0, 1).step(0.05).onChange(function(newValue) {
     self.light.lightAmb[2] = newValue;
     self.draw();
   });
-  gui.add(self, 'diffuseR').step(0.2).onChange(function(newValue) {
+  gui.add(self, 'diffuseR', 0, 1).step(0.05).onChange(function(newValue) {
     self.light.lightDiff[0] = newValue;
     self.draw();
   });
-  gui.add(self, 'diffuseG').step(0.2).onChange(function(newValue) {
+  gui.add(self, 'diffuseG', 0, 1).step(0.05).onChange(function(newValue) {
     self.light.lightDiff[1] = newValue;
     self.draw();
   });
-  gui.add(self, 'diffuseB').step(0.2).onChange(function(newValue) {
+  gui.add(self, 'diffuseB', 0, 1).step(0.05).onChange(function(newValue) {
     self.light.lightDiff[2] = newValue;
     self.draw();
   });
-  gui.add(self, 'specularR').step(0.2).onChange(function(newValue) {
+  gui.add(self, 'specularR', 0, 1).step(0.05).onChange(function(newValue) {
     self.light.lightSpec[0] = newValue;
     self.draw();
   });
-  gui.add(self, 'specularG').step(0.2).onChange(function(newValue) {
+  gui.add(self, 'specularG', 0, 1).step(0.05).onChange(function(newValue) {
     self.light.lightSpec[1] = newValue;
     self.draw();
   });
-  gui.add(self, 'specularB').step(0.2).onChange(function(newValue) {
+  gui.add(self, 'specularB', 0, 1).step(0.05).onChange(function(newValue) {
     self.light.lightSpec[2] = newValue;
     self.draw();
   });
