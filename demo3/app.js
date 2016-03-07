@@ -237,7 +237,7 @@ function computeMovement(eye, scale) {
     Math.pow(vector.y, 2) +
     Math.pow(vector.z, 2)
   );
-  magnitude += scale;
+  //magnitude += scale;
   vector.x /= magnitude;
   vector.y /= magnitude;
   vector.z /= magnitude;
@@ -270,12 +270,18 @@ function setupKeyboardHandlers(eye) {
         eye.position.x += movementVector.x;
         eye.position.y += movementVector.y;
         eye.position.z += movementVector.z;
+        eye.looking.x += movementVector.x;
+        eye.looking.y += movementVector.y;
+        eye.looking.z += movementVector.z;
         break;
       case 107: // k, for moving backward
         var movementVector = computeMovement(eye, 0.5);
         eye.position.x -= movementVector.x;
         eye.position.y -= movementVector.y;
         eye.position.z -= movementVector.z;
+        eye.looking.x -= movementVector.x;
+        eye.looking.y -= movementVector.y;
+        eye.looking.z -= movementVector.z;
         break;
       default:
         console.log(event.keyCode);
@@ -303,7 +309,11 @@ function draw(gl, canvas, modelMatrix, viewMatrix, projMatrix, normalMatrix,
 
 function updateShapes(shapes) {
   if (!dragging) {
-    var joint = shapes[1];
+    var morning = shapes[0],
+        joint = shapes[1],
+        house = shapes[4];
+
+    morning.slider.rotation.x += 1;
 
     joint.out.rotation.z -= 1;
     joint.out.rotation.y -= 1;
@@ -311,5 +321,8 @@ function updateShapes(shapes) {
     joint.bend2.rotation.x -= 1;
     joint.bend3.rotation.x -= 1;
     joint.end.rotation.x -= 3;
+
+    house.base.rotation.z += 1;
+    //house.roof.rotation.z += 1;
   }
 }
