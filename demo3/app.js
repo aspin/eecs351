@@ -2,6 +2,15 @@ var VSHADER = 'vShared',
     FSHADER = 'fShared';
 
 var dragging = false;
+var light;
+
+function toggleHeadlight() {
+  light.headlightOn = !light.headlightOn;
+}
+
+function toggleWorldLight() {
+  light.worldLightOn = !light.worldLightOn;
+}
 
 function main() {
   loadShaders(function(sources) {
@@ -19,7 +28,7 @@ function main() {
         u_MvpMatrix = matrices[1],
         u_NormalMatrix = matrices[2];
 
-    var light = new Light(gl);
+    light = new Light(gl);
     light.setLights({
       pos: [0.0, 0.0, 1000.0],
       amb: [1.0, 1.0, 1.0],

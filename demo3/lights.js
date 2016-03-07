@@ -2,6 +2,12 @@
 function Light(gl) {
   this.gl = gl;
 
+  this.worldLightOn = true;
+  this.headlightOn = true;
+
+  this.u_worldOn = gl.getUniformLocation(gl.program, 'u_worldOn');
+  this.u_headOn = gl.getUniformLocation(gl.program, 'u_headOn');
+
   this.u_LightPos = gl.getUniformLocation(gl.program, 'light.u_LightPos');
   this.u_LightAmb = gl.getUniformLocation(gl.program, 'light.u_LightAmb');
   this.u_LightDiff = gl.getUniformLocation(gl.program, 'light.u_LightDiff');
@@ -60,6 +66,9 @@ Light.prototype.updateLights = function(viewMatrix) {
   this.gl.uniform3fv(this.u_LightAmb, this.lightAmb);
   this.gl.uniform3fv(this.u_LightDiff, this.lightDiff);
   this.gl.uniform3fv(this.u_LightSpec, this.lightSpec);
+
+  this.gl.uniform1i(this.u_worldOn, this.worldLightOn);
+  this.gl.uniform1i(this.u_headOn, this.headlightOn);
 };
 
 Light.prototype.setMaterial = function(material) {
