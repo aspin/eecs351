@@ -210,5 +210,58 @@ function getVertices() {
 
   var triangles = rectangleTris.concat(icosaTriangles).concat(starTriangles).concat(pTriangles).concat(groundTriangles);
   var trianglesArray = drawUtil.exportTriangles(triangles);
-  return trianglesArray;
+
+  // return trianglesArray;
+
+  // sphere
+  var floatsPerVertex = 9
+  var zAxisSlices = 13;
+  var sliceVerts = 26;
+  var sliceAngle = Math.PI / zAxisSlices;
+  var sphereVertices = new Float32Array(((zAxisSlices * 2 * sliceVerts) - 2) * floatsPerVertex);
+  var cos0 = 0.0;
+  var sin0 = 0.0;
+  var cos1 = 0.0;
+  var sin1 = 0.0;
+  var j = 0;
+  var isLast = 0;
+  var isFirst = 1;
+  for (s = 0; s < zAxisSlices; s++) {
+    if (s == 0) {
+      isFirst = 1;
+      cos0 = 1.0;
+      sin0 = 0.0;
+    }
+    else {
+      isFirst = 0;
+      cos0 = cos1;
+      sin0 = sin1;
+    }
+    cos1 = Math.cos((s + 1) * sliceAngle);
+    sin1 = Math.sin((s + 1) * sliceAngle);
+    if (s == zAxisSlices - 1) isLast = 1;
+    for (var v = isFirst; v < 2 * sliceVerts - isLast; v++, j += floatsPerVertex) {
+      if (v % 2 == 0) {
+        sphereVertices[j] = sin0 * Math.cos(Math.PI * (v) / sliceVerts);
+        sphereVertices[j + 1] = sin0 * Math.sin(Math.PI * (v) / sliceVerts);
+        sphereVertices[j + 2] = cos0;
+      }
+      else {
+        sphereVertices[j] = sin1 * Math.cos(Math.PI * (v - 1) / sliceVerts);
+        sphereVertices[j + 1] = sin1 * Math.sin(Math.PI * (v - 1) / sliceVerts);
+        sphereVertices[j + 2] = cos1;
+      }
+      sphereVertices[j + 3] = sphereVertices[j];
+      sphereVertices[j + 4] = sphereVertices[j + 1];
+      sphereVertices[j + 5] = sphereVertices[j + 2];
+      sphereVertices[j + 6] = sphereVertices[j];
+      sphereVertices[j + 7] = sphereVertices[j + 1];
+      sphereVertices[j + 8] = sphereVertices[j + 2];
+    }
+  }
+
+  var finalArray = new Float32Array(trianglesArray.length + sphereVertices.length);
+  finalArray.set(trianglesArray);
+  finalArray.set(sphereVertices, trianglesArray.length);
+  return finalArray;
 }

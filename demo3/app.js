@@ -196,11 +196,11 @@ function setupMouseHandlers(gl, canvas, shapes) {
 
   canvas.onmouseup = function(event) {
     dragging = false;
-    var vertices = getVertices();
-    var a_Color = gl.getAttribLocation(gl.program, 'a_Color');
-    var size = vertices.BYTES_PER_ELEMENT;
-    gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
-    gl.vertexAttribPointer(a_Color, 3, gl.FLOAT, false, size * 9, size * 3);
+  //   var vertices = getVertices();
+  //   var a_Color = gl.getAttribLocation(gl.program, 'a_Color');
+  //   var size = vertices.BYTES_PER_ELEMENT;
+  //   gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
+  //   gl.vertexAttribPointer(a_Color, 3, gl.FLOAT, false, size * 9, size * 3);
   };
 
   canvas.onmousemove = function(event) {

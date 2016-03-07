@@ -90,7 +90,7 @@ function MorningStar(position, scale, rotation) {
     new Coordinate(scale / 10, scale / 2.5, scale / 10),
     new Rotation(rotation.x, rotation.y, rotation.z, rotation.xy, rotation.xz, rotation.yz),
     new Coordinate(0, -scale / 2.5, 0), new Material(MATL_OBSIDIAN));
-  this.ball = new Icosahedron(
+  this.ball = new Sphere(
     new Coordinate(0, -scale * 0.6, 0),
     new Coordinate(scale / 5, scale / 5, scale / 5),
     new Rotation(rotation.x, rotation.y, rotation.z, rotation.xy, rotation.xz, rotation.yz),
@@ -184,6 +184,7 @@ function Shape(position, scale, rotation, origin, material) {
   this.material = material;
   this.start = 0;
   this.length = 0;
+  this.drawMethod = 'TRIANGLES';
 }
 
 Shape.prototype.draw = function(gl, modelMatrix, viewMatrix, projMatrix, normalMatrix,
@@ -198,7 +199,7 @@ Shape.prototype.draw = function(gl, modelMatrix, viewMatrix, projMatrix, normalM
     light.setMaterial(this.material);
   }
   injectMvpMatrix(gl, modelMatrix, viewMatrix, projMatrix, normalMatrix, u_ModelMatrix, u_MvpMatrix, u_NormalMatrix);
-  gl.drawArrays(gl.TRIANGLES, this.start, this.length);
+  gl.drawArrays(gl[this.drawMethod], this.start, this.length);
 };
 
 function Rectangle() {
@@ -232,6 +233,16 @@ function Pyramid() {
 }
 
 Pyramid.prototype = new Shape();
+
+function Sphere() {
+  Shape.apply(this, Array.prototype.slice.call(arguments));
+  this.start = 216;
+  this.length = 674;
+  this.drawMethod = 'TRIANGLE_STRIP';
+}
+
+Sphere.prototype = new Shape();
+
 
 function injectMvpMatrix(gl, modelMatrix, viewMatrix, projMatrix, normalMatrix, u_ModelMatrix, u_MvpMatrix, u_NormalMatrix) {
   // cloning projMatrix
