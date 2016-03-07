@@ -21,7 +21,7 @@ function main() {
 
     var light = new Light(gl);
     light.setLights({
-      pos: [0.0, 0.0, 100.0],
+      pos: [0.0, 0.0, 1000.0],
       amb: [1.0, 1.0, 1.0],
       diff: [1.0, 1.0, 1.0],
       spec: [1.0, 1.0, 1.0],
@@ -262,6 +262,10 @@ function setupKeyboardHandlers(eye) {
         break;
       case 115: // s, for down
         eye.looking.z -= 0.08;
+        break;
+      case 104: // h, pan left
+        break;
+      case 108: // l, pan right
         break;
       case 106: //j, for moving forward
         var movementVector = computeMovement(eye, 0.5);

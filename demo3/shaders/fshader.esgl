@@ -24,7 +24,7 @@ void main() {
 
   vec3 emissive = light.u_Ke;
   vec3 ambient = light.u_LightAmb * light.u_Ka;
-  vec3 diffuse = light.u_LightDiff * v_Kd * nDotL;
+  vec3 diffuse = light.u_LightDiff * light.u_Kd * nDotL;
   vec3 speculr = light.u_LightSpec * light.u_Ks * e64;
 
   gl_FragColor = vec4(emissive + ambient + diffuse + speculr, 1.0);
