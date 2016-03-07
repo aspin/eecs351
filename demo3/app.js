@@ -23,15 +23,15 @@ function main() {
     gl.uniform3fv(u_eyePosWorld, [3.0, 2.0, 1.5]);
     var light = new Light(gl);
     light.initLights({
-      pos: [0.0, 0.0, 10.0],
-      amb: [0.4, 0.4, 0.4],
+      pos: [0.0, 0.0, 100.0],
+      amb: [1.0, 1.0, 1.0],
       diff: [1.0, 1.0, 1.0],
       spec: [1.0, 1.0, 1.0],
-      ke: [0.0, 0.0, 0.0],
-      ka: [0.0, 0.6, 0.6],
-      kd: [0.8, 0.0, 0.0],
+      ke: [0.8, 0.8, 0.8],
+      ka: [0.6, 0.6, 0.6],
+      kd: [0.8, 0.8, 0.8],
       ks: [0.8, 0.8, 0.8],
-      kshiny: 16
+      kshiny: 128
     });
 
     var shapes = [];
@@ -78,7 +78,7 @@ function main() {
 
       updateShapes(shapes);
       draw(gl, canvas, modelMatrix, viewMatrix, projMatrix, normalMatrix,
-        u_ModelMatrix, u_MvpMatrix, u_NormalMatrix, shapes, eye);
+        u_ModelMatrix, u_MvpMatrix, u_NormalMatrix, shapes, eye, light);
       requestAnimationFrame(animate, canvas);
     };
     animate();
@@ -280,7 +280,7 @@ function setupKeyboardHandlers(eye) {
 }
 
 function draw(gl, canvas, modelMatrix, viewMatrix, projMatrix, normalMatrix,
-              u_ModelMatrix, u_MvpMatrix, u_NormalMatrix, shapes, eye) {
+              u_ModelMatrix, u_MvpMatrix, u_NormalMatrix, shapes, eye, light) {
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
   viewMatrix.setLookAt(eye.position.x, eye.position.y, eye.position.z,
                        eye.looking.x, eye.looking.y, eye.looking.z,
@@ -290,7 +290,8 @@ function draw(gl, canvas, modelMatrix, viewMatrix, projMatrix, normalMatrix,
   gl.viewport(0, 0, canvas.width, canvas.height);
   projMatrix.setPerspective(40, aspectRatio, 1, 100);
   for(var i in shapes) {
-    shapes[i].draw(gl, modelMatrix, viewMatrix, projMatrix, normalMatrix, u_ModelMatrix, u_MvpMatrix, u_NormalMatrix);
+    shapes[i].draw(gl, modelMatrix, viewMatrix, projMatrix, normalMatrix,
+      u_ModelMatrix, u_MvpMatrix, u_NormalMatrix, light);
   }
 }
 

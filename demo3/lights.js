@@ -13,7 +13,6 @@ function Light(gl) {
   this.u_Ks = gl.getUniformLocation(gl.program, 'light.u_Ks');
   this.u_Kshiny = gl.getUniformLocation(gl.program, 'light.u_Kshiny');
 
-  debugger;
   if (!(this.u_LightPos && this.u_LightAmb && this.u_LightDiff && this.u_LightSpec &&
     this.u_Ke && this.u_Ka && this.u_Kd && this.u_Ks && this.u_Kshiny)) {
     throw 'Failed to setup light storage locations';
@@ -48,6 +47,22 @@ Light.prototype.initLights = function(options) {
   this.gl.uniform3fv(this.u_LightDiff, this.lightDiff);
   this.gl.uniform3fv(this.u_LightSpec, this.lightSpec);
 
+  this.gl.uniform3fv(this.u_Ke, this.matl_Ke);
+  this.gl.uniform3fv(this.u_Ka, this.matl_Ka);
+  this.gl.uniform3fv(this.u_Kd, this.matl_Kd);
+  this.gl.uniform3fv(this.u_Ks, this.matl_Ks);
+  this.gl.uniform1i(this.u_Kshiny, this.matl_Kshiny);
+};
+
+Light.prototype.setMaterial = function(material) {
+  this.gl.uniform3f(this.u_Ke, material.emissive[0], material.emissive[1], material.emissive[2]);
+  this.gl.uniform3f(this.u_Ka, material.ambient[0], material.ambient[1], material.ambient[2]);
+  this.gl.uniform3f(this.u_Kd, material.diffuse[0], material.diffuse[1], material.diffuse[2]);
+  this.gl.uniform3f(this.u_Ks, material.specular[0], material.specular[1], material.specular[2]);
+  this.gl.uniform1i(this.u_Kshiny, material.shiny);
+};
+
+Light.prototype.reset = function() {
   this.gl.uniform3fv(this.u_Ke, this.matl_Ke);
   this.gl.uniform3fv(this.u_Ka, this.matl_Ka);
   this.gl.uniform3fv(this.u_Kd, this.matl_Kd);

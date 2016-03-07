@@ -47,7 +47,9 @@ GroundGrid.prototype.draw = function(gl, modelMatrix, viewMatrix, projMatrix, no
 
 function Cube(position, scale, rotation) {
   this.cube = new Rectangle(position,
-    new Coordinate(scale, scale, scale), rotation, new Coordinate(0, 0, 0));
+    new Coordinate(scale, scale, scale), rotation, new Coordinate(0, 0, 0),
+    new Material(MATL_BRASS)
+  );
 }
 
 Cube.prototype.draw = function(gl, modelMatrix, viewMatrix, projMatrix, normalMatrix, u_ModelMatrix, u_MvpMatrix, u_NormalMatrix) {
@@ -57,7 +59,7 @@ Cube.prototype.draw = function(gl, modelMatrix, viewMatrix, projMatrix, normalMa
 
 function LonelyPyramid(position, scale, rotation) {
   this.pyramid = new Pyramid(position,
-    new Coordinate(scale, scale, scale), rotation, new Coordinate(0, 0, 0));
+    new Coordinate(scale, scale, scale), rotation, new Coordinate(0, 0, 0), new Material(MATL_RED_PLASTIC));
 }
 
 LonelyPyramid.prototype.draw = function(gl, modelMatrix, viewMatrix, projMatrix, normalMatrix, u_ModelMatrix, u_MvpMatrix, u_NormalMatrix) {
@@ -67,11 +69,15 @@ LonelyPyramid.prototype.draw = function(gl, modelMatrix, viewMatrix, projMatrix,
 
 function House(position, scale, rotation) {
   this.base = new Rectangle(position,
-    new Coordinate(scale, scale, scale), rotation, new Coordinate(0, 0, 0));
+    new Coordinate(scale, scale, scale), rotation, new Coordinate(0, 0, 0),
+    new Material(MATL_EMERALD)
+  );
   this.roof = new Pyramid(
     new Coordinate(0, 0, scale * 0.9),
     new Coordinate(scale * 1.3, scale * 1.3, scale * 1.3),
-    rotation, new Coordinate(0, 0, 0));
+    rotation, new Coordinate(0, 0, 0),
+    new Material(MATL_RUBY)
+  );
 }
 
 House.prototype.draw = function(gl, modelMatrix, viewMatrix, projMatrix, normalMatrix, u_ModelMatrix, u_MvpMatrix, u_NormalMatrix) {
@@ -87,22 +93,22 @@ function MorningStar(position, scale, rotation) {
     position,
     new Coordinate(scale, scale / 5, scale / 3),
     new Rotation(rotation.x, rotation.y, rotation.z, rotation.xy, rotation.xz, rotation.yz),
-    new Coordinate(0, 0, 0));
+    new Coordinate(0, 0, 0), new Material(MATL_OBSIDIAN));
   this.handle = new Rectangle(
     new Coordinate(0, -scale, 0),
     new Coordinate(scale / 5, scale, scale / 5),
     new Rotation(rotation.x, rotation.y, rotation.z, rotation.xy, rotation.xz, rotation.yz),
-    new Coordinate(0, -scale, 0));
+    new Coordinate(0, -scale, 0), new Material(MATL_CHROME));
   this.chain = new Rectangle(
     new Coordinate(0, -scale, 0),
     new Coordinate(scale / 10, scale / 2.5, scale / 10),
     new Rotation(rotation.x, rotation.y, rotation.z, rotation.xy, rotation.xz, rotation.yz),
-    new Coordinate(0, -scale / 2.5, 0));
+    new Coordinate(0, -scale / 2.5, 0), new Material(MATL_OBSIDIAN));
   this.ball = new Icosahedron(
     new Coordinate(0, -scale * 0.6, 0),
     new Coordinate(scale / 5, scale / 5, scale / 5),
     new Rotation(rotation.x, rotation.y, rotation.z, rotation.xy, rotation.xz, rotation.yz),
-    new Coordinate(0, 0, 0));
+    new Coordinate(0, 0, 0), new Material(MATL_GOLD_SHINY));
 }
 
 MorningStar.prototype.draw = function(gl, modelMatrix, viewMatrix, projMatrix, normalMatrix, u_ModelMatrix, u_MvpMatrix, u_NormalMatrix) {
@@ -121,42 +127,42 @@ function Joint(position, scale, rotation) {
     position,
     new Coordinate(scale, scale / 5, scale / 5),
     new Rotation(rotation.x, rotation.y, rotation.z, rotation.xy, rotation.xz, rotation.yz),
-    new Coordinate(0, 0, 0));
+    new Coordinate(0, 0, 0), new Material(MATL_BLU_PLASTIC));
   this.join = new Rectangle(
     new Coordinate(scale / 1.25, 0, 0),
     new Coordinate(scale / 2, scale / 2, scale / 2),
     new Rotation(rotation.x, rotation.y, rotation.z, rotation.xy, rotation.xz, rotation.yz),
-    new Coordinate(0, 0, 0));
+    new Coordinate(0, 0, 0), new Material(MATL_EMERALD));
   this.bend = new Rectangle(
     new Coordinate(0, scale / 1.25, 0),
     new Coordinate(scale / 5, scale, scale / 5),
     new Rotation(rotation.x, rotation.y, rotation.z, rotation.xy, rotation.xz, rotation.yz),
-    new Coordinate(0, scale / 1.25, 0));
+    new Coordinate(0, scale / 1.25, 0), new Material(MATL_BLU_PLASTIC));
   this.join2 = new Rectangle(
     new Coordinate(0, scale * 1.5, 0),
     new Coordinate(scale / 2, scale / 2, scale / 2),
     new Rotation(rotation.x, rotation.y, rotation.z, rotation.xy, rotation.xz, rotation.yz),
-    new Coordinate(0, 0, 0));
+    new Coordinate(0, 0, 0), new Material(MATL_EMERALD));
   this.bend2 = new Rectangle(
     new Coordinate(0, scale / 1.25, 0),
     new Coordinate(scale / 5, scale, scale / 5),
     new Rotation(rotation.x, rotation.y, rotation.z + 270, rotation.xy, rotation.xz, rotation.yz),
-    new Coordinate(0, scale / 1.25, 0));
+    new Coordinate(0, scale / 1.25, 0), new Material(MATL_BLU_PLASTIC));
   this.join3 = new Rectangle(
     new Coordinate(0, scale * 1.5, 0),
     new Coordinate(scale / 2, scale / 2, scale / 2),
     new Rotation(rotation.x, rotation.y, rotation.z, rotation.xy, rotation.xz, rotation.yz),
-    new Coordinate(0, 0, 0));
+    new Coordinate(0, 0, 0), new Material(MATL_EMERALD));
   this.bend3 = new Rectangle(
     new Coordinate(0, scale / 1.25, 0),
     new Coordinate(scale / 5, scale, scale / 5),
     new Rotation(rotation.x, rotation.y, rotation.z + 90, rotation.xy, rotation.xz, rotation.yz),
-    new Coordinate(0, scale / 1.25, 0));
+    new Coordinate(0, scale / 1.25, 0), new Material(MATL_BLU_PLASTIC));
   this.end = new MultiPyramid(
     new Coordinate(0, scale * 1.5, 0),
     new Coordinate(scale, scale, scale),
     new Rotation(rotation.x, rotation.y, rotation.z, rotation.xy, rotation.xz, rotation.yz),
-    new Coordinate(0, scale * 1.5, 0));
+    new Coordinate(0, scale * 1.5, 0), new Material(MATL_TURQUOISE));
 }
 
 Joint.prototype.draw = function(gl, modelMatrix, viewMatrix, projMatrix, normalMatrix, u_ModelMatrix, u_MvpMatrix, u_NormalMatrix) {
@@ -194,14 +200,23 @@ function Shape(position, scale, rotation, origin, material) {
   this.length = 0;
 }
 
-Shape.prototype.draw = function(gl, modelMatrix, viewMatrix, projMatrix, normalMatrix, u_ModelMatrix, u_MvpMatrix, u_NormalMatrix) {
+Shape.prototype.draw = function(gl, modelMatrix, viewMatrix, projMatrix, normalMatrix,
+                                u_ModelMatrix, u_MvpMatrix, u_NormalMatrix, light) {
   updateMatrices(modelMatrix, viewMatrix, projMatrix, normalMatrix,
     new Coordinate(this.scale.x, this.scale.y, this.scale.z),
     new Rotation(this.rotation.x, this.rotation.y, this.rotation.z, this.rotation.xy, this.rotation.xz, this.rotation.yz),
     new Coordinate(this.origin.x, this.origin.y, this.origin.z),
     new Coordinate(this.position.x, this.position.y, this.position.z));
+  this.updateLights(light);
   injectMvpMatrix(gl, modelMatrix, viewMatrix, projMatrix, normalMatrix, u_ModelMatrix, u_MvpMatrix, u_NormalMatrix);
   gl.drawArrays(gl.TRIANGLES, this.start, this.length);
+};
+
+Shape.prototype.updateLights = function(light) {
+  light.reset();
+  if (this.material) {
+    light.setMaterial(this.material);
+  }
 };
 
 function Rectangle() {
@@ -248,7 +263,7 @@ function injectMvpMatrix(gl, modelMatrix, viewMatrix, projMatrix, normalMatrix, 
 
   var mvpMatrix = tempProjMatrix.multiply(tempViewMatrix);
 
-  gl.uniformMatrix4fv(u_ModelMatrix, false, modelMatrix.elements);
+  gl.uniformMatrix4fv(u_ModelMatrix, false, tempViewMatrix.elements);
   gl.uniformMatrix4fv(u_MvpMatrix, false, mvpMatrix.elements);
   gl.uniformMatrix4fv(u_NormalMatrix, false, normalMatrix.elements);
 }
