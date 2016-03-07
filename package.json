@@ -9,5 +9,9 @@
   "devDependencies": {
     "browser-sync": "2.11.0",
     "gulp": "3.9.0"
+  },
+  "dependencies": {
+    "fs": "0.0.2",
+    "gulp-inject-string": "1.1.0"
   }
 }
