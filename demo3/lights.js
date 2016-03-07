@@ -30,7 +30,7 @@ function Light(gl) {
   this.matl_Kshiny = false;
 }
 
-Light.prototype.initLights = function(options) {
+Light.prototype.setLights = function(options) {
   this.lightPos.set(options.pos);
   this.lightAmb.set(options.amb);
   this.lightDiff.set(options.diff);
@@ -47,11 +47,18 @@ Light.prototype.initLights = function(options) {
   this.gl.uniform3fv(this.u_LightDiff, this.lightDiff);
   this.gl.uniform3fv(this.u_LightSpec, this.lightSpec);
 
-  this.gl.uniform3fv(this.u_Ke, this.matl_Ke);
-  this.gl.uniform3fv(this.u_Ka, this.matl_Ka);
-  this.gl.uniform3fv(this.u_Kd, this.matl_Kd);
-  this.gl.uniform3fv(this.u_Ks, this.matl_Ks);
-  this.gl.uniform1i(this.u_Kshiny, this.matl_Kshiny);
+  //this.gl.uniform3fv(this.u_Ke, this.matl_Ke);
+  //this.gl.uniform3fv(this.u_Ka, this.matl_Ka);
+  //this.gl.uniform3fv(this.u_Kd, this.matl_Kd);
+  //this.gl.uniform3fv(this.u_Ks, this.matl_Ks);
+  //this.gl.uniform1i(this.u_Kshiny, this.matl_Kshiny);
+};
+
+Light.prototype.updateLights = function() {
+  this.gl.uniform3fv(this.u_LightPos, this.lightPos);
+  this.gl.uniform3fv(this.u_LightAmb, this.lightAmb);
+  this.gl.uniform3fv(this.u_LightDiff, this.lightDiff);
+  this.gl.uniform3fv(this.u_LightSpec, this.lightSpec);
 };
 
 Light.prototype.setMaterial = function(material) {
@@ -69,3 +76,76 @@ Light.prototype.reset = function() {
   this.gl.uniform3fv(this.u_Ks, this.matl_Ks);
   this.gl.uniform1i(this.u_Kshiny, this.matl_Kshiny);
 };
+
+function LightGUI(light, draw) {
+  var self = this;
+
+  this.light = light;
+  this.draw = draw;
+
+  this.lightX = this.light.lightPos[0];
+  this.lightY = this.light.lightPos[1];
+  this.lightZ = this.light.lightPos[2];
+  this.ambientR = this.light.lightAmb[0];
+  this.ambientG = this.light.lightAmb[1];
+  this.ambientB = this.light.lightAmb[2];
+  this.diffuseR = this.light.lightDiff[0];
+  this.diffuseG = this.light.lightDiff[1];
+  this.diffuseB = this.light.lightDiff[2];
+  this.specularR = this.light.lightSpec[0];
+  this.specularG = this.light.lightSpec[1];
+  this.specularB = this.light.lightSpec[2];
+
+  var gui = new dat.GUI();
+  gui.add(self, 'lightX').step(0.2).onChange(function(newValue) {
+    self.light.lightPos[0] = newValue;
+    self.draw();
+  });
+  gui.add(self, 'lightY').step(0.2).onChange(function(newValue) {
+    self.light.lightPos[1] = newValue;
+    self.draw();
+  });
+  gui.add(self, 'lightZ').step(0.2).onChange(function(newValue) {
+    self.light.lightPos[2] = newValue;
+    self.draw();
+  });
+  gui.add(self, 'ambientR').step(0.2).onChange(function(newValue) {
+    self.light.lightAmb[0] = newValue;
+    self.draw();
+  });
+  gui.add(self, 'ambientG').step(0.2).onChange(function(newValue) {
+    self.light.lightAmb[1] = newValue;
+    self.draw();
+  });
+  gui.add(self, 'ambientB').step(0.2).onChange(function(newValue) {
+    self.light.lightAmb[2] = newValue;
+    self.draw();
+  });
+  gui.add(self, 'diffuseR').step(0.2).onChange(function(newValue) {
+    self.light.lightDiff[0] = newValue;
+    self.draw();
+  });
+  gui.add(self, 'diffuseG').step(0.2).onChange(function(newValue) {
+    self.light.lightDiff[1] = newValue;
+    self.draw();
+  });
+  gui.add(self, 'diffuseB').step(0.2).onChange(function(newValue) {
+    self.light.lightDiff[2] = newValue;
+    self.draw();
+  });
+  gui.add(self, 'specularR').step(0.2).onChange(function(newValue) {
+    self.light.lightSpec[0] = newValue;
+    self.draw();
+  });
+  gui.add(self, 'specularG').step(0.2).onChange(function(newValue) {
+    self.light.lightSpec[1] = newValue;
+    self.draw();
+  });
+  gui.add(self, 'specularB').step(0.2).onChange(function(newValue) {
+    self.light.lightSpec[2] = newValue;
+    self.draw();
+  });
+}
+
+
+

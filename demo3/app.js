@@ -19,10 +19,10 @@ function main() {
         u_MvpMatrix = matrices[1],
         u_NormalMatrix = matrices[2];
 
-    var u_eyePosWorld = gl.getUniformLocation(gl.program, 'u_eyePosWorld');
-    gl.uniform3fv(u_eyePosWorld, [3.0, 2.0, 1.5]);
+    //var u_eyePosWorld = gl.getUniformLocation(gl.program, 'u_eyePosWorld');
+    //gl.uniform3fv(u_eyePosWorld, [0.0, 0.0, 0.0]);
     var light = new Light(gl);
-    light.initLights({
+    light.setLights({
       pos: [0.0, 0.0, 100.0],
       amb: [1.0, 1.0, 1.0],
       diff: [1.0, 1.0, 1.0],
@@ -63,13 +63,18 @@ function main() {
     shapes.push(new GroundGrid());
 
     var eye = new Eye(
-      new Coordinate(3.0, 2.0, 1.5),
+      new Coordinate(7.0, 0.0, 2.0),
       new Coordinate(0.0, 0.0, 0.0),
       new Coordinate(0.0, 0.0, 1.0)
     );
 
     setupMouseHandlers(gl, canvas, shapes);
     setupKeyboardHandlers(eye);
+
+    var lightGUI = new LightGUI(light, function() {
+      draw(gl, canvas, modelMatrix, viewMatrix, projMatrix, normalMatrix,
+        u_ModelMatrix, u_MvpMatrix, u_NormalMatrix, shapes, eye, light);
+    });
 
     var animate = function() {
       // Autostretch
@@ -209,7 +214,7 @@ function setupMouseHandlers(gl, canvas, shapes) {
 
 
 var angle = 0;
-var offset = Math.atan(2/3);
+var offset = Math.atan(0);
 function computePosition(eye, angle) {
   var distance = computeEyeDistance(eye);
   var position = [ eye.position.x - distance * Math.cos(angle + offset),
@@ -282,6 +287,7 @@ function setupKeyboardHandlers(eye) {
 function draw(gl, canvas, modelMatrix, viewMatrix, projMatrix, normalMatrix,
               u_ModelMatrix, u_MvpMatrix, u_NormalMatrix, shapes, eye, light) {
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+  light.updateLights();
   viewMatrix.setLookAt(eye.position.x, eye.position.y, eye.position.z,
                        eye.looking.x, eye.looking.y, eye.looking.z,
                        eye.up.x, eye.up.y, eye.up.z);
