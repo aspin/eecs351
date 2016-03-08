@@ -70,7 +70,7 @@ Light.prototype.setMaterial = function(material) {
   this.gl.uniform3f(this.u_Ka, material.ambient[0], material.ambient[1], material.ambient[2]);
   this.gl.uniform3f(this.u_Kd, material.diffuse[0], material.diffuse[1], material.diffuse[2]);
   this.gl.uniform3f(this.u_Ks, material.specular[0], material.specular[1], material.specular[2]);
-  this.gl.uniform1i(this.u_Kshiny, material.shiny);
+  this.gl.uniform1f(this.u_Kshiny, material.shiny);
 };
 
 Light.prototype.reset = function() {
@@ -78,7 +78,7 @@ Light.prototype.reset = function() {
   this.gl.uniform3fv(this.u_Ka, this.matl_Ka);
   this.gl.uniform3fv(this.u_Kd, this.matl_Kd);
   this.gl.uniform3fv(this.u_Ks, this.matl_Ks);
-  this.gl.uniform1i(this.u_Kshiny, this.matl_Kshiny);
+  this.gl.uniform1f(this.u_Kshiny, this.matl_Kshiny);
 };
 
 function LightGUI(light, draw) {
