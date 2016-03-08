@@ -165,6 +165,13 @@ function bindVariables(gl, vertices) {
   gl.vertexAttribPointer(a_Position, 3, gl.FLOAT, false, size * 9, 0);
   gl.enableVertexAttribArray(a_Position);
 
+  var a_Color = gl.getAttribLocation(gl.program, 'a_Color');
+  if (a_Color < 0) {
+    throw 'Failed to get a_Color';
+  }
+  gl.vertexAttribPointer(a_Color, 3, gl.FLOAT, false, size * 9, size * 3);
+  gl.enableVertexAttribArray(a_Color);
+
   var a_Normal = gl.getAttribLocation(gl.program, 'a_Normal');
   if (a_Normal < 0) {
     throw 'Failed to get a_Normal';
