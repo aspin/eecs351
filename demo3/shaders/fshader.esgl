@@ -28,10 +28,18 @@ void main() {
   float nDotH = max(dot(H, normal), 0.0);
   float e64 = pow(nDotH, float(light.u_Kshiny));
 
-  vec3 emissive = light.u_Ke;
-  vec3 ambient = light.u_LightAmb * light.u_Ka;
-  vec3 diffuse = light.u_LightDiff * light.u_Kd * nDotL;
-  vec3 speculr = light.u_LightSpec * light.u_Ks * e64;
+  vec3 emissive, ambient, diffuse, speculr;
+  if (u_usePhongShading) {
+    emissive = light.u_Ke;
+    ambient = light.u_LightAmb * light.u_Ka;
+    diffuse = light.u_LightDiff * light.u_Kd * nDotL;
+    speculr = light.u_LightSpec * light.u_Ks * e64;
+  } else {
+    emissive = vec3(0.0);
+    ambient = light.u_LightAmb * v_Color.rgb;
+    diffuse = light.u_LightDiff * v_Color.rgb * nDotL;
+    speculr = light.u_LightSpec * v_Color.rgb * e64;
+  }
 
   vec3 worldLight;
   if (u_worldOn) {
@@ -45,8 +53,14 @@ void main() {
   vec3 headH = normalize(headlightDirection - normalize(v_Position.xyz));
   float headnDotH = max(dot(headH, normal), 0.0);
 
-  vec3 headDiffuse = light.u_LightDiff * light.u_Kd * headnDotL;
-  vec3 headSpecular = light.u_LightSpec * light.u_Ks * pow(headnDotH, float(light.u_Kshiny));
+  vec3 headDiffuse, headSpecular;
+  if (u_usePhongShading) {
+    headDiffuse = light.u_LightDiff * light.u_Kd * headnDotL;
+    headSpecular = light.u_LightSpec * light.u_Ks * pow(headnDotH, float(light.u_Kshiny));
+  } else {
+    headDiffuse = light.u_LightDiff * v_Color.rgb * headnDotL;
+    headSpecular = light.u_LightSpec * v_Color.rgb * pow(headnDotH, float(light.u_Kshiny));
+  }
 
   vec3 headLight;
   if (u_headOn) {

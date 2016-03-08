@@ -12,6 +12,10 @@ function toggleWorldLight() {
   light.worldLightOn = !light.worldLightOn;
 }
 
+function toggleShadingMethod() {
+  light.usePhongShading = !light.usePhongShading;
+}
+
 function main() {
   loadShaders(function(sources) {
     var canvas = document.getElementById('webgl'),

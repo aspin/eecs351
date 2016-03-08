@@ -4,9 +4,11 @@ function Light(gl) {
 
   this.worldLightOn = true;
   this.headlightOn = true;
+  this.usePhongShading = true;
 
   this.u_worldOn = gl.getUniformLocation(gl.program, 'u_worldOn');
   this.u_headOn = gl.getUniformLocation(gl.program, 'u_headOn');
+  this.u_usePhongShading = gl.getUniformLocation(gl.program, 'u_usePhongShading');
 
   this.u_LightPos = gl.getUniformLocation(gl.program, 'light.u_LightPos');
   this.u_LightAmb = gl.getUniformLocation(gl.program, 'light.u_LightAmb');
@@ -63,6 +65,7 @@ Light.prototype.updateLights = function(viewMatrix) {
 
   this.gl.uniform1i(this.u_worldOn, this.worldLightOn);
   this.gl.uniform1i(this.u_headOn, this.headlightOn);
+  this.gl.uniform1i(this.u_usePhongShading, this.usePhongShading);
 };
 
 Light.prototype.setMaterial = function(material) {
