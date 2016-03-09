@@ -24,9 +24,17 @@ void main() {
   vec3 normal = normalize(v_Normal);
   vec3 lightDirection = normalize(light.u_LightPos - v_Position.xyz);
   float nDotL = max(dot(lightDirection, normal), 0.0);
-  vec3 H = normalize(lightDirection - normalize(v_Position.xyz));
-  float nDotH = max(dot(H, normal), 0.0);
-  float e64 = pow(nDotH, float(light.u_Kshiny));
+
+  float e64;
+  if (u_usePhongLighting) {
+    vec3 R = reflect(-lightDirection, normal);
+    float nDotR = max(dot(R,  - normalize(v_Position.xyz)), 0.0);
+    e64 = pow(nDotR, float(light.u_Kshiny));
+  } else {
+    vec3 H = normalize(lightDirection - normalize(v_Position.xyz));
+    float nDotH = max(dot(H, normal), 0.0);
+    e64 = pow(nDotH, float(light.u_Kshiny));
+  }
 
   vec3 emissive, ambient, diffuse, speculr;
   if (u_usePhongShading) {
@@ -50,16 +58,27 @@ void main() {
 
   vec3 headlightDirection = normalize(vec3(-v_Position));
   float headnDotL = max(dot(headlightDirection, normal), 0.0);
-  vec3 headH = normalize(headlightDirection - normalize(v_Position.xyz));
-  float headnDotH = max(dot(headH, normal), 0.0);
+  // vec3 headH = normalize(headlightDirection - normalize(v_Position.xyz));
+  // float headnDotH = max(dot(headH, normal), 0.0);
+
+  float he64;
+  if (u_usePhongLighting) {
+    vec3 R = reflect(-headlightDirection, normal);
+    float nDotR = max(dot(R, -normalize(v_Position.xyz)), 0.0);
+    he64 = pow(nDotR, float(light.u_Kshiny));
+  } else {
+    vec3 H = normalize(headlightDirection - normalize(v_Position.xyz));
+    float nDotH = max(dot(H, normal), 0.0);
+    he64 = pow(nDotH, float(light.u_Kshiny));
+  }
 
   vec3 headDiffuse, headSpecular;
   if (u_usePhongShading) {
     headDiffuse = light.u_LightDiff * light.u_Kd * headnDotL;
-    headSpecular = light.u_LightSpec * light.u_Ks * pow(headnDotH, float(light.u_Kshiny));
+    headSpecular = light.u_LightSpec * light.u_Ks * he64;
   } else {
     headDiffuse = light.u_LightDiff * v_Color.rgb * headnDotL;
-    headSpecular = light.u_LightSpec * v_Color.rgb * pow(headnDotH, float(light.u_Kshiny));
+    headSpecular = light.u_LightSpec * v_Color.rgb * he64;
   }
 
   vec3 headLight;

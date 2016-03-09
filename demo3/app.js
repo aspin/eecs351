@@ -1,7 +1,7 @@
 var VSHADER = 'vShared',
     FSHADER = 'fShared';
 
-var dragging = false;
+var dragging = false, moving = true;
 var light;
 
 function toggleHeadlight() {
@@ -14,6 +14,14 @@ function toggleWorldLight() {
 
 function toggleShadingMethod() {
   light.usePhongShading = !light.usePhongShading;
+}
+
+function toggleLightingMethod() {
+  light.usePhongLighting = !light.usePhongLighting;
+}
+
+function toggleMotion() {
+  moving = !moving;
 }
 
 function main() {
@@ -279,22 +287,22 @@ function setupKeyboardHandlers(eye) {
   window.onkeypress = function (event) {
     switch (event.keyCode) {
       case 119: // w, for up
-        eye.looking.z += 0.08;
+        eye.looking.z += 0.06;
         break;
       case 97: // a, for left
-        angle = (angle + 0.05) % (2 * Math.PI);
+        angle = (angle + 0.03) % (2 * Math.PI);
         var newLocation = computePosition(eye, angle);
         eye.looking.x = newLocation[0];
         eye.looking.y = newLocation[1];
         break;
       case 100: // d, for right
-        angle = (angle - 0.05) % (2 * Math.PI);
+        angle = (angle - 0.03) % (2 * Math.PI);
         var newLocation = computePosition(eye, angle);
         eye.looking.x = newLocation[0];
         eye.looking.y = newLocation[1];
         break;
       case 115: // s, for down
-        eye.looking.z -= 0.08;
+        eye.looking.z -= 0.06;
         break;
       case 104: // h, pan left
         var movementVector = computeLateralMovement(eye, 0.5);
@@ -357,11 +365,11 @@ function draw(gl, canvas, modelMatrix, viewMatrix, projMatrix, normalMatrix,
 }
 
 function updateShapes(shapes) {
-  if (!dragging) {
+  if (!dragging && moving) {
     var morning = shapes[0],
         joint = shapes[1],
         cube = shapes[2],
-        pyramid = shapes[3]
+        pyramid = shapes[3],
         house = shapes[4];
 
     morning.slider.rotation.x += 1;
