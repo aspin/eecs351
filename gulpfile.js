@@ -61,7 +61,7 @@ gulp.task('js', function() {
   } else {
     throw new Exception('needs base');
   }
-  gulp.src([base + '/**/**.js', '!' + base + '/app.js'])
+  gulp.src(['!' + base + '/dist/**/*', base + '/**/**.js', '!' + base + '/app.js'])
     .pipe(gulp.dest(base + '/dist'));
 });
 
