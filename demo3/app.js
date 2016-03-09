@@ -215,11 +215,6 @@ function setupMouseHandlers(gl, canvas, shapes) {
 
   canvas.onmouseup = function(event) {
     dragging = false;
-  //   var vertices = getVertices();
-  //   var a_Color = gl.getAttribLocation(gl.program, 'a_Color');
-  //   var size = vertices.BYTES_PER_ELEMENT;
-  //   gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
-  //   gl.vertexAttribPointer(a_Color, 3, gl.FLOAT, false, size * 9, size * 3);
   };
 
   canvas.onmousemove = function(event) {
@@ -268,9 +263,9 @@ function computeMovement(eye, scale) {
 }
 
 function computeLateralMovement(eye, scale) {
-  var vector = { x: eye.position.y - eye.looking.y,
-                 y: - eye.position.x + eye.looking.x,
-                 z: eye.position.z - eye.looking.z };
+  var vector = { x: eye.position.z - eye.looking.z,
+                 y: eye.position.x - eye.looking.x,
+                 z: eye.position.y - eye.looking.y };
   var magnitude = Math.sqrt(
     Math.pow(vector.x, 2) +
     Math.pow(vector.y, 2) +
@@ -308,19 +303,19 @@ function setupKeyboardHandlers(eye) {
         var movementVector = computeLateralMovement(eye, 0.5);
         eye.position.x -= movementVector.x;
         eye.position.y -= movementVector.y;
-        // eye.position.z -= movementVector.z;
+        eye.position.z -= movementVector.z;
         eye.looking.x -= movementVector.x;
         eye.looking.y -= movementVector.y;
-        // eye.looking.z -= movementVector.z;
+        eye.looking.z -= movementVector.z;
         break;
       case 108: // l, pan right
         var movementVector = computeLateralMovement(eye, 0.5);
         eye.position.x += movementVector.x;
         eye.position.y += movementVector.y;
-        // eye.position.z += movementVector.z;
+        eye.position.z += movementVector.z;
         eye.looking.x += movementVector.x;
         eye.looking.y += movementVector.y;
-        // eye.looking.z += movementVector.z;
+        eye.looking.z += movementVector.z;
         break;
       case 106: //j, for moving forward
         var movementVector = computeMovement(eye, 0.5);
